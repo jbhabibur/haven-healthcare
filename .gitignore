@@ -1,0 +1,19 @@
+# Environment variables (Crucial for security)
+.env
+
+# Python libraries and virtual environments
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Local Database
+db.sqlite3
+
+# Tailwind & Frontend
+node_modules/
+staticfiles/
+
+# IDE settings
+.vscode/

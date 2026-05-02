@@ -1,0 +1,22 @@
+# .dockerignore
+
+# Git files
+.git
+.gitignore
+
+# Python
+.venv
+venv/
+env/
+__pycache__
+*.pyc
+
+# Database
+db.sqlite3
+
+# Environment (Docker uses .env via docker-compose)
+.env
+
+# Tailwind
+node_modules
+staticfiles
