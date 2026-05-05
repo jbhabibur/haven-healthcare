@@ -1,0 +1,35 @@
+{% load static %}
+
+<header class="bg-white shadow-sm font-sans sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+        
+        <!-- Desktop Version -->
+        <div class="hidden lg:block">
+            <!-- Desktop Top Row: Logo -->
+            <div class="py-2">
+                <a href="/">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-12">
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation Row -->
+            <div class="border-t border-gray-100">
+                {% include "includes/desktop_nav.html" %}
+            </div>
+        </div>
+
+        <!-- Mobile Version -->
+        <div class="block lg:hidden py-3">
+            <!-- Mobile Top Row: Logo -->
+            <div class="flex justify-start mb-3">
+                <a href="/">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-8">
+                </a>
+            </div>
+            
+            <!-- Mobile Bottom Row: Menu, Search, Cart -->
+            {% include "includes/mobile_nav.html" %}
+        </div>
+
+    </div>
+</header>

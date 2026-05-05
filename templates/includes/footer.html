@@ -1,0 +1,93 @@
+{% load static %}
+
+<footer class="bg-primary text-white pt-12 pb-6 font-sans">
+    <div class="container mx-auto px-4">
+        <!-- Top Footer Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            
+            <!-- Column 1: Logo & About -->
+            <div class="space-y-4">
+                <a href="/" class="text-2xl font-bold text-white flex items-center gap-1 uppercase tracking-tighter">
+                    <span class="text-accent">HAVEN</span> HEALTHCARE
+                </a>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Haven Healthcare is dedicated to providing premium medical services and high-quality healthcare products. Our mission is to ensure accessible and natural wellness solutions for everyone.
+                </p>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="text-slate-300 hover:text-accent transition-colors">Health Blog</a></li>
+                    <li><a href="#" class="text-slate-300 hover:text-accent transition-colors">Our Doctors</a></li>
+                    <li><a href="#" class="text-slate-300 hover:text-accent transition-colors">Emergency Support</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 2: Quick Links -->
+            <div>
+                <h3 class="text-accent font-semibold text-sm mb-6 uppercase tracking-[0.2em]">Quick Links</h3>
+                <ul class="space-y-3 text-sm text-slate-400">
+                    <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Services</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Terms & Conditions</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Medical Categories -->
+            <div>
+                <h3 class="text-accent font-semibold text-sm mb-6 uppercase tracking-[0.2em]">Our Services</h3>
+                <ul class="space-y-3 text-sm text-slate-400">
+                    <li><a href="#" class="hover:text-white transition-colors">Unani Medicine</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">General Consultation</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Baby & Child Care</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Skin & Hair Treatment</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Diagnostic Tests</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Healthcare Packages</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Contact Information -->
+            <div>
+                <h3 class="text-accent font-semibold text-sm mb-6 uppercase tracking-[0.2em]">Contact Info</h3>
+                <div class="space-y-4 text-sm text-slate-400">
+                    <div class="flex items-start gap-3">
+                        <div class="mt-1 text-accent"><i class="fa-solid fa-location-dot"></i></div>
+                        <span>Savar, Dhaka Division, Bangladesh</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="mt-1 text-accent"><i class="fa-solid fa-phone"></i></div>
+                        <span>+880 1XXX-XXXXXX</span>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="mt-1 text-accent"><i class="fa-solid fa-envelope"></i></div>
+                        <span>support@havenhealthcare.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Footer -->
+        <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <!-- Social Icons -->
+            <div class="flex gap-3">
+                <!-- Facebook -->
+                <a href="#" class="flex items-center justify-center w-10 h-10 bg-slate-800 rounded-full hover:bg-accent hover:text-white transition-all duration-300">
+                    <i class="fa-brands fa-facebook-f text-sm"></i>
+                </a>
+                <!-- TikTok -->
+                <a href="#" class="flex items-center justify-center w-10 h-10 bg-slate-800 rounded-full hover:bg-accent hover:text-white transition-all duration-300">
+                    <i class="fa-brands fa-tiktok text-sm"></i>
+                </a>
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-slate-500 text-xs tracking-wider text-center md:text-left">
+                © 2026 <span class="text-slate-300 font-medium uppercase">Haven Healthcare Center</span>. ALL RIGHTS RESERVED.
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="opacity-50 hover:opacity-100 transition-opacity duration-300">
+                <img src="{% static 'images/SSLCOMMERZ-Payment-img.avif' %}" alt="Secure Payment" class="h-6 filter grayscale brightness-200">
+            </div>
+        </div>
+    </div>
+</footer>

@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
     curl \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
@@ -30,7 +30,7 @@ WORKDIR /app
 
 # Runtime dependencies (Only essential packages)
 RUN apt-get update && apt-get install -y libpq-dev curl \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y libpq-dev curl \
 COPY --from=builder /install /usr/local
 
 # Copy all project files
-COPY . .
+COPY . .clea
 
 # Create a non-root user (Crucial for production security)
 RUN useradd -m havenuser && chown -R havenuser /app

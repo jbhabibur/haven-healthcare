@@ -1,0 +1,31 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "---\r ## 🤝 Contributing\r Contributions are what make the open-source community such an amazing place to learn, inspire, and create.\r 1. Fork the Project\r 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)\r 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)\r 4. Push to the Branch (`git push origin feature/AmazingFeature`)\r 5. Open a Pull RequestA high-quality `README.md` is essential for making your Unani Healthcare platform look professional and accessible to other developers. Here is a comprehensive template tailored for your project.\r ---",
+  "main": "index.js",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "detect-libc": "^2.1.2",
+    "enhanced-resolve": "^5.21.0",
+    "graceful-fs": "^4.2.11",
+    "is-extglob": "^2.1.1",
+    "is-glob": "^4.0.3",
+    "jiti": "^2.6.1",
+    "lightningcss": "^1.32.0",
+    "lightningcss-win32-x64-msvc": "^1.32.0",
+    "magic-string": "^0.30.21",
+    "mri": "^1.2.0",
+    "node-addon-api": "^7.1.1",
+    "picocolors": "^1.1.1",
+    "picomatch": "^4.0.4",
+    "source-map-js": "^1.2.1",
+    "tailwindcss": "^4.2.4",
+    "tapable": "^2.3.3"
+  },
+  "scripts": {
+    "dev": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/dist/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

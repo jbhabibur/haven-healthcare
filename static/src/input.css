@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors - Dibuat lebih vibrant tapi tetap profesional */
+  --color-primary: #3d5a80; /* Deep Slate Blue (Lebih berkelas & modern) */
+  --color-secondary: #2a9d8f; /* Muted Teal (Lebih tajam untuk aksi) */
+  --color-accent: #e76f51; /* Burnt Terracotta (Lebih modern daripada coral biasa) */
+
+  /* Neutral Colors - Mengganti beige ke arah Off-White/Grey agar terlihat bersih */
+  --color-surface: #f8f9fa; /* Ghost White (Sangat bersih & luas) */
+  --color-surface-muted: #ffffff; /* Putih murni untuk kartu agar "pop-out" */
+
+  /* Text & Borders - Kontras tinggi adalah kunci clean design */
+  --color-text-main: #1d2d35; /* Charcoal Navy (Sangat tajam untuk dibaca) */
+  --color-text-muted: #64748b; /* Slate Grey untuk sub-teks */
+  --color-border: #e2e8f0; /* Soft Grey border (Standard industri modern) */
+
+  /* Semantic Colors */
+  --color-success: #06d6a0;
+  --color-warning: #ffd166;
+  --color-error: #ef476f;
+
+  /* Extra: Shadow untuk efek Depth */
+  --shadow-soft: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
+}
