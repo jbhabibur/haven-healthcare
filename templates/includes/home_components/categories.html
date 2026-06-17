@@ -1,0 +1,83 @@
+<div class="bg-surface py-12">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-10">
+            <h2 class="text-xl md:text-2xl font-bold text-text-main border-b-2 border-secondary inline-block pb-2">
+                Shop By Natural Product Category
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            
+            <!-- Shop -->
+            <a href="{% url 'products:category_products' 'shop' %}" class="group border border-border rounded-lg overflow-hidden bg-surface-muted shadow-sm hover:shadow-soft transition-all duration-300 flex flex-col">
+                <div class="bg-secondary group-hover:opacity-90 transition-opacity p-6 flex items-center justify-center text-white text-3xl aspect-square">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                </div>
+                <div class="p-2.5 text-center flex-grow flex items-center justify-center">
+                    <span class="text-xs font-bold text-text-main group-hover:text-secondary transition-colors duration-200">Shop</span>
+                </div>
+            </a>
+
+            <!-- Unani Medicine -->
+            <a href="{% url 'products:category_products' 'unani-medicine' %}" class="group border border-border rounded-lg overflow-hidden bg-surface-muted shadow-sm hover:shadow-soft transition-all duration-300 flex flex-col">
+                <div class="bg-secondary group-hover:opacity-90 transition-opacity p-6 flex items-center justify-center text-white text-3xl aspect-square">
+                    <i class="fa-solid fa-capsules"></i>
+                </div>
+                <div class="p-2.5 text-center flex-grow flex items-center justify-center">
+                    <span class="text-xs font-bold text-text-main group-hover:text-secondary transition-colors duration-200">Unani Medicine</span>
+                </div>
+            </a>
+
+            <!-- Health & Wellness -->
+            <a href="{% url 'products:category_products' 'food-supplement' %}" class="group border border-border rounded-lg overflow-hidden bg-surface-muted shadow-sm hover:shadow-soft transition-all duration-300 flex flex-col">
+                <div class="bg-secondary group-hover:opacity-90 transition-opacity p-6 flex items-center justify-center text-white text-3xl aspect-square">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div class="p-2.5 text-center flex-grow flex items-center justify-center">
+                    <span class="text-xs font-bold text-text-main group-hover:text-secondary transition-colors duration-200">Health & Wellness</span>
+                </div>
+            </a>
+
+            <!-- Baby Care -->
+            <a href="{% url 'products:category_products' 'baby-care' %}" class="group border border-border rounded-lg overflow-hidden bg-surface-muted shadow-sm hover:shadow-soft transition-all duration-300 flex flex-col">
+                <div class="bg-secondary group-hover:opacity-90 transition-opacity p-6 flex items-center justify-center text-white text-3xl aspect-square">
+                    <i class="fa-solid fa-baby"></i>
+                </div>
+                <div class="p-2.5 text-center flex-grow flex items-center justify-center">
+                    <span class="text-xs font-bold text-text-main group-hover:text-secondary transition-colors duration-200">Baby Care</span>
+                </div>
+            </a>
+
+            <!-- Skin & Hair Care -->
+            <a href="{% url 'products:category_products' 'skin-hair-care' %}" class="group border border-border rounded-lg overflow-hidden bg-surface-muted shadow-sm hover:shadow-soft transition-all duration-300 flex flex-col">
+                <div class="bg-secondary group-hover:opacity-90 transition-opacity p-6 flex items-center justify-center text-white text-3xl aspect-square">
+                    <i class="fa-solid fa-spa"></i>
+                </div>
+                <div class="p-2.5 text-center flex-grow flex items-center justify-center">
+                    <span class="text-xs font-bold text-text-main group-hover:text-secondary transition-colors duration-200">Skin & Hair Care</span>
+                </div>
+            </a>
+
+            <!-- Sexual Wellness -->
+            <a href="{% url 'products:category_products' 'sexual-wellness' %}" class="group border border-border rounded-lg overflow-hidden bg-surface-muted shadow-sm hover:shadow-soft transition-all duration-300 flex flex-col">
+                <div class="bg-secondary group-hover:opacity-90 transition-opacity p-6 flex items-center justify-center text-white text-3xl aspect-square">
+                    <i class="fa-solid fa-venus-mars"></i>
+                </div>
+                <div class="p-2.5 text-center flex-grow flex items-center justify-center">
+                    <span class="text-xs font-bold text-text-main group-hover:text-secondary transition-colors duration-200">Sexual Wellness</span>
+                </div>
+            </a>
+
+            <!-- Combo Offer -->
+            <a href="{% url 'products:category_products' 'combo-offer' %}" class="group border border-border rounded-lg overflow-hidden bg-surface-muted shadow-sm hover:shadow-soft transition-all duration-300 flex flex-col">
+                <div class="bg-secondary group-hover:opacity-90 transition-opacity p-6 flex items-center justify-center text-white text-3xl aspect-square">
+                    <i class="fa-solid fa-tags"></i>
+                </div>
+                <div class="p-2.5 text-center flex-grow flex items-center justify-center">
+                    <span class="text-xs font-bold text-text-main group-hover:text-secondary transition-colors duration-200">Combo Offer</span>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+<!-- products/templates/products/includes/product_grid_section.html -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+  
+  <!-- Left Sidebar: Desktop Only -->
+  <aside class="col-span-1 hidden lg:block border-r border-[--color-border] pr-4 h-full">
+    {% include "products/includes/top_rated_sidebar.html" %}
+  </aside>
+
+  <!-- Center/Right Content: Product Grid -->
+  <section class="col-span-1 lg:col-span-4 order-first lg:order-none">
+    
+    <!-- Heading & Conditional See All Link -->
+    <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-3">
+      <!-- Left side: Category Name -->
+      <h2 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">
+        {{ category.name|default:"Unani & Natural Products" }}
+      </h2>
+      
+      <!-- Only show "See All" if the current active URL routing name is exactly 'home' -->
+      {% if request.resolver_match.url_name == 'home' %}
+        <!-- FIXED: changed 'product_list' to 'category_products' to match your urls.py -->
+        <a href="{% url 'products:category_products' category_slug='shop' %}" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition duration-200 flex items-center gap-1">
+          See All <i class="fa-solid fa-angle-right text-xs"></i>
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Mobile view features 2 columns for better layout matching the design -->
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-stretch">
+      {% for product in products %}
+        {% include "products/includes/product_card.html" %}
+      {% empty %}
+        <div class="col-span-full text-center py-12">
+          <p class="text-[var(--color-text-muted)] text-lg">No products available in this category.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Bottom Sidebar: Mobile/Tablet Only -->
+  <aside class="col-span-1 block lg:hidden border-t border-[--color-border] pt-6 mt-4">
+    {% include "products/includes/top_rated_sidebar.html" %}
+  </aside>
+
+</div>

@@ -2,39 +2,11 @@
 
 {% block content %}
 <main class="min-h-screen bg-white text-[--color-text-main] font-sans antialiased">
-  
   <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-6">
     
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
-      
-      <aside class="col-span-1 hidden lg:block border-r border-[--color-border] pr-4 h-full">
-        {% include "products/includes/top_rated_sidebar.html" %}
-      </aside>
+    <!-- Reusing the exact same layout safely -->
+    {% include "products/includes/product_grid_section.html" %}
 
-      <section class="col-span-1 lg:col-span-4 order-first lg:order-none">
-        
-        <div class="text-center mb-6">
-          <h1 class="text-2xl font-bold text-[--color-secondary] tracking-normal uppercase">
-            {{ category.name|default:"Medicine Collection" }}
-          </h1>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-stretch">
-          {% for product in products %}
-            {% include "products/includes/product_card.html" %}
-          {% empty %}
-            <div class="col-span-full text-center py-12">
-              <p class="text-[var(--color-text-muted)] text-lg">No products available in this category.</p>
-            </div>
-          {% endfor %}
-        </div>
-      </section>
-
-      <aside class="col-span-1 block lg:hidden border-t border-[--color-border] pt-6 mt-4">
-        {% include "products/includes/top_rated_sidebar.html" %}
-      </aside>
-
-    </div>
   </div>
 </main>
 {% endblock content %}

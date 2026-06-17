@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% include "includes/home_components/carousel.html" %}
+
+    {% include "includes/home_components/categories.html" %}
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        {% include "products/includes/product_grid_section.html" %}
+    </div>
+
+    {% include "includes/home_components/best_selling_links.html" %}
+
+    {% include "includes/home_components/features_banner.html" %}
+
+{% endblock content %}

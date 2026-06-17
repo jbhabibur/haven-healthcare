@@ -1,0 +1,61 @@
+{% load static %}
+
+<div x-data="{ 
+        activeSlide: 1, 
+        slides: [1, 2, 3, 4],
+        init() { setInterval(() => { this.activeSlide = this.activeSlide === this.slides.length ? 1 : this.activeSlide + 1 }, 5000) }
+     }" 
+     class="relative w-full overflow-hidden aspect-[3/1] sm:aspect-[3.5/1] md:h-[350px] lg:h-[400px]">
+    
+    <div x-show="activeSlide === 1" 
+         x-transition:enter="transition ease-out duration-700"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-700"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="absolute inset-0 w-full h-full">
+        <img src="{% static 'images/slide1.jpeg' %}" alt="Hero Product" class="w-full h-full object-cover">
+    </div>
+
+    <div x-show="activeSlide === 2" 
+         x-transition:enter="transition ease-out duration-700"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-700"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="absolute inset-0 w-full h-full">
+        <img src="{% static 'images/slide2.jpeg' %}" alt="Slide 2 Product" class="w-full h-full object-cover">
+    </div>
+
+    <div x-show="activeSlide === 3" 
+         x-transition:enter="transition ease-out duration-700"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-700"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="absolute inset-0 w-full h-full">
+        <img src="{% static 'images/slide3.jpeg' %}" alt="Slide 3 Product" class="w-full h-full object-cover">
+    </div>
+
+    <div x-show="activeSlide === 4" 
+         x-transition:enter="transition ease-out duration-700"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-700"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="absolute inset-0 w-full h-full">
+        <img src="{% static 'images/slide4.jpeg' %}" alt="Slide 4 Product" class="w-full h-full object-cover">
+    </div>
+
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+        <template x-for="slide in slides" :key="slide">
+            <button @click="activeSlide = slide" 
+                    :class="activeSlide === slide ? 'bg-emerald-600 w-6' : 'bg-slate-300/60 w-2'" 
+                    class="h-2 rounded-full transition-all duration-300 focus:outline-none shadow-sm"></button>
+        </template>
+    </div>
+</div>
