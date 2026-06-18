@@ -3,8 +3,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
+from django.contrib import messages
 from .models import DoctorSlot, Appointment
 from accounts.models import DoctorProfile, PatientProfile
+
 
 
 #  DOCTOR SLOT VIEWS
@@ -37,7 +39,6 @@ class DoctorSlotCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_valid(form)
 
 
-
 #  APPOINTMENT VIEWS
 class AppointmentListView(LoginRequiredMixin, ListView):
     """Displays a list of appointments based on the authenticated user's role"""
@@ -62,28 +63,67 @@ class AppointmentDetailView(LoginRequiredMixin, DetailView):
 
 
 class BookAppointmentView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    """Allows patients to request or book an appointment with a doctor"""
+    """Allows authenticated patients to request or book an appointment with a doctor"""
     model = Appointment
     template_name = 'appointments/book_appointment.html'
-    fields = ['doctor', 'slot', 'preferred_date', 'preferred_time_notes', 'symptoms']
-    success_url = reverse_lazy('appointment_list')
+    # 'doctor' and 'slot' fields are handled via URL query parameters and hidden inputs
+    fields = ['preferred_date', 'preferred_time_notes', 'symptoms']
+    success_url = reverse_lazy('appointments:appointment_list')
+
+    # Essential to allow custom handling via handle_no_permission instead of instant 403 response
+    raise_exception = True 
 
     def test_func(self):
-        # Restricts access to ensure only patients can request appointments
-        return self.request.user.is_patient
+        # Checks if the user is authenticated and possesses a patient role
+        return self.request.user.is_authenticated and getattr(self.request.user, 'is_patient', False)
+
+    def handle_no_permission(self):
+        """Redirects unauthenticated users to login with a warning toast message instead of showing 403 Forbidden"""
+        if not self.request.user.is_authenticated:
+            # Adds a warning toast notification message for guest users
+            messages.warning(self.request, "Please log in to your account first to book an online appointment.")
+            return redirect('accounts:login') 
+        
+        # Adds an error toast if user is logged in but does not hold a patient role
+        messages.error(self.request, "Only patient accounts are authorized to book appointment requests.")
+        return redirect('appointments:doctor_list')
 
     def form_valid(self, form):
-        # Automatically assigns the requesting patient's profile and sets default status
-        form.instance.patient = get_object_or_404(PatientProfile, user=self.request.user)
-        form.instance.status = 'PENDING'
-        return super().form_valid(form)
-    
+        doctor_id = self.request.POST.get('doctor')
 
+        print("POST DATA =", self.request.POST)
+        print("DOCTOR ID =", doctor_id)
+
+        form.instance.doctor = get_object_or_404(
+            DoctorProfile,
+            id=doctor_id
+        )
+
+        form.instance.patient = get_object_or_404(
+            PatientProfile,
+            user=self.request.user
+        )
+
+        form.instance.status = 'PENDING'
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        # Passes the selected doctor data to the template to build an informative booking summary UI
+        context = super().get_context_data(**kwargs)
+        doctor_id = self.request.GET.get('doctor')
+        if doctor_id:
+            context['selected_doctor'] = get_object_or_404(DoctorProfile, id=doctor_id)
+        return context
+
+
+
+#  PUBLIC LIST/DETAIL VIEWS
 class DoctorPublicListView(ListView):
     """Displays a public list of all available doctors"""
     model = DoctorProfile
     template_name = 'appointments/doctor_list.html'
-    context_object_name = 'doctors'  # Used in the template within {% for doctor in doctors %}
+    context_object_name = 'doctors'
 
 
 class DoctorDetailView(DetailView):

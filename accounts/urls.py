@@ -9,6 +9,8 @@ from .views import (
     MyPasswordResetCompleteView
 )
 
+from . import views
+
 app_name = 'accounts'
 
 urlpatterns = [
@@ -22,4 +24,6 @@ urlpatterns = [
     path('password-reset/done/', MyPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('password-reset-confirm/<uidb64>/<token>/', MyPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password-reset-complete/', MyPasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    path('profile/update-phone/', views.update_phone_ajax, name='update_phone'),
 ]

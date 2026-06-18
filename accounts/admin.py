@@ -94,8 +94,8 @@ class DoctorReviewAdmin(admin.ModelAdmin):
 @admin.register(PatientProfile)
 class PatientProfileAdmin(admin.ModelAdmin):
     """Manages simple list view records for registered patients"""
-    list_display = ('get_patient_name', 'age', 'blood_group')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'blood_group')
+    list_display = ('get_patient_name', 'phone_number', 'age', 'blood_group')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'phone_number', 'blood_group')
     list_filter = ('blood_group',)
     
     autocomplete_fields = ('user',)

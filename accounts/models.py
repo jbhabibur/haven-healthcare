@@ -1,11 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db.models import Avg
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from cloudinary.models import CloudinaryField
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # --- Custom User Model ---
@@ -41,7 +43,6 @@ class DoctorProfile(models.Model):
         related_name='doctor_profile'
     )
 
-    # --- Cloudinary Optional Image Field ---
     image = CloudinaryField(
         'image', 
         folder='doctors',
@@ -56,14 +57,14 @@ class DoctorProfile(models.Model):
     registration_number = models.CharField(max_length=50, blank=True, null=True, help_text="E.g., U-543")
 
     doctor_info = models.TextField(
-    blank=True, 
-    null=True, 
-    help_text=(
-        "এডমিন নির্দেশিকা: ডক্টরের মূল পরিচিতি, চিকিৎসাপ্রাপ্ত রোগের তালিকা এবং নিচের "
-        "স্লোগানটি ইমেজের বা প্রেসক্রিপশনের মতো হুবহু এন্টার (New Line) দিয়ে দিয়ে এখানে পেস্ট করুন। "
-        "কোনো প্রকার HTML ট্যাগ ব্যবহারের প্রয়োজন নেই, ফ্রন্টএন্ডে এটি স্বয়ংক্রিয়ভাবে সাজিয়ে নিবে।"
+        blank=True, 
+        null=True, 
+        help_text=(
+            "এডমিন নির্দেশিকা: ডক্টরের মূল পরিচিতি, চিকিৎসাপ্রাপ্ত রোগের তালিকা এবং নিচের "
+            "স্লোগানটি ইমেজের বা প্রেসক্রিপশনের মতো হুবহু এন্টার (New Line) দিয়ে দিয়ে এখানে পেস্ট করুন। "
+            "কোনോ প্রকার HTML ট্যাগ ব্যবহারের প্রয়োজন নেই, ফ্রন্টএন্ডে এটি স্বয়ংক্রিয়ভাবে সাজিয়ে নিবে।"
+        )
     )
-)
     
     # Fees
     consultation_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -71,6 +72,10 @@ class DoctorProfile(models.Model):
     follow_up_validity_days = models.PositiveIntegerField(default=14, help_text="Number of days the follow-up fee is applicable")
 
     is_available = models.BooleanField(default=True)
+    
+    # --- Admin Approval Fields for Doctors ---
+    is_approved = models.BooleanField(default=False, help_text="Designates whether this doctor is approved by admin.")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         if self.user.first_name or self.user.last_name:
@@ -142,9 +147,7 @@ class DoctorExperience(models.Model):
 class DoctorReview(models.Model):
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='submitted_reviews') 
-    rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)] 
-    )
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     comment = models.TextField(blank=True, null=True) 
     created_at = models.DateTimeField(auto_now_add=True) 
 
@@ -159,9 +162,27 @@ class DoctorReview(models.Model):
 # --- Patient Profile ---
 class PatientProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='patient_profile')
+
+    phone_regex = RegexValidator(
+        regex=r'^\+?(88)?01[3-9]\d{8}$', 
+        message="Phone number must be entered in the format: '01XXXXXXXXX' or '+8801XXXXXXXXX'. Up to 14 digits allowed."
+    )
+    phone_number = models.CharField(
+        validators=[phone_regex], 
+        max_length=15, 
+        blank=True, 
+        null=True, 
+        unique=True,
+        help_text="Enter patient's valid phone number"
+    )
+
     age = models.PositiveIntegerField(null=True, blank=True)
     blood_group = models.CharField(max_length=5, blank=True)
     medical_history = models.TextField(blank=True)
+    
+    # --- Admin Approval Fields for Patients ---
+    is_approved = models.BooleanField(default=False, help_text="Designates whether this patient is approved by admin.")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         if self.user.first_name or self.user.last_name:

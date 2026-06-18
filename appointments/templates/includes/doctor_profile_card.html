@@ -101,7 +101,8 @@
                             </button>
                         </div>
                         
-                        <a href="{% url 'appointments:book_appointment' %}?doctor_id={{ doctor.id }}" class="w-full bg-[#2b6cb0] hover:bg-[#23578e] text-white text-sm font-semibold py-2 px-4 rounded-md flex items-center justify-center gap-2 transition-colors evaluation-link">
+                        <a href="{% url 'appointments:book_appointment' %}?doctor={{ doctor.id }}" 
+                           class="w-full bg-[#2b6cb0] hover:bg-[#23578e] text-white text-sm font-semibold py-2.5 px-4 rounded-md flex items-center justify-center gap-2 transition-colors evaluation-link text-center">
                             <i class="fa-regular fa-calendar-check"></i> Book Online Appointment
                         </a>
                     </div>

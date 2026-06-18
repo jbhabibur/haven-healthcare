@@ -1,6 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if messages %}
+<div class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none max-w-sm w-full sm:w-[380px]">
+    {% for message in messages %}
+        <div x-data="{ show: true }" 
+             x-show="show" 
+             x-init="setTimeout(() => show = false, 4000)"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-2"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="pointer-events-auto flex items-start gap-3 p-4 bg-white border rounded-xl shadow-lg transition-all duration-300
+                    {% if message.tags == 'warning' %} border-amber-200 text-amber-800 bg-amber-50/90
+                    {% elif message.tags == 'error' %} border-red-200 text-red-800 bg-red-50/90
+                    {% elif message.tags == 'success' %} border-green-200 text-green-800 bg-green-50/90
+                    {% else %} border-blue-200 text-blue-800 bg-blue-50/80 {% endif %}">
+            
+            <div class="flex-shrink-0 mt-0.5">
+                {% if message.tags == 'warning' %}
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-base"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="fa-solid fa-circle-exclamation text-red-500 text-base"></i>
+                {% elif message.tags == 'success' %}
+                    <i class="fa-solid fa-circle-check text-green-500 text-base"></i>
+                {% else %}
+                    <i class="fa-solid fa-circle-info text-blue-500 text-base"></i>
+                {% endif %}
+            </div>
+
+            <div class="flex-grow text-xs sm:text-sm font-medium pr-4 leading-relaxed">
+                {{ message.message }}
+            </div>
+
+            <button @click="show = false" class="flex-shrink-0 ml-auto text-gray-400 hover:text-gray-600 transition-colors focus:outline-none">
+                <i class="fa-solid fa-xmark text-xs sm:text-sm"></i>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <div class="flex min-h-[80vh] items-center justify-center bg-[var(--color-surface)] p-4">
     
     <div class="w-full max-w-md rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-8 shadow-[var(--shadow-soft)] transition-all duration-300">
