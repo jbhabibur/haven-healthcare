@@ -1,0 +1,110 @@
+<div class="max-w-6xl mx-auto mt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-7">
+            
+            <div x-show="activeTab === 'info'" x-transition:enter="transition ease-out duration-200" class="space-y-6">
+                <p class="text-[15px] text-gray-800 leading-relaxed font-normal">
+                    {{ doctor.biography|default:"ডাঃ নূর আলম, রাজশাহী মেডিকেল বিশ্ববিদ্যালয়ের মেডিসিন অনুষদ থেকে ন্যাচারাল মেডিসিনের উপর বাংলাদেশের সর্বোচ্চ ডিগ্রী (BUMS - Bachelor of Unani Medicine & Surgery) অর্জন করেছেন এবং ইসলামী বিশ্ববিদ্যালয়, কুষ্টিয়াতে Food & Nutrition এর উপর স্নাতকোত্তর এ অধ্যয়নরত। বর্তমানে রেনিক্স ইউনানী ল্যাবরেটরিজ লিমিটেড এ মেডিকেল অফিসার হিসেবে কর্মরত আছেন। রেনিক্স চিকিৎসা কেন্দ্রে পুরুষ ও মহিলাদের হরমোনজনিত সমস্যা, অ্যালার্জি, চর্মরোগ, যৌন সমস্যা এবং যেকোনো ধরনের ব্যথা বিষয়ে নিয়মিত রোগী দেখছেন।" }}
+                </p>
+                
+                <div class="space-y-3">
+                    <p class="text-[15px] text-gray-800 font-medium">
+                        আপনার যদি নিচের সমস্যাগুলো থাকে, তাহলে চিকিৎসা ও পরামর্শ নিতে পারেন ইনশাআল্লাহ্‌–
+                    </p>
+                    <ul class="space-y-2.5 text-[15px] text-gray-700 pl-1">
+                        {% if doctor.specialties_list %}
+                            {% for specialty in doctor.specialties_list %}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-gray-400 mt-1 text-[10px]">■</span>
+                                    <span>{{ specialty }}</span>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="flex items-start gap-2">
+                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
+                                <span>পাইলস / অর্শ রোগ</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
+                                <span>প্রস্রাবে সমস্যা - জ্বালা-পোড়া, ঘন ঘন প্রস্রাব, ইনফেকশন</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
+                                <span>হজমজনিত সমস্যা ও কোষ্ঠকাঠিন্য</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
+                                <span>লিভারের সমস্যা</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
+                                <span>পেটের পীড়া, জ্বালা-পোড়া, আলসার</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <div x-show="activeTab === 'experience'" x-transition:enter="transition ease-out duration-200" style="display: none;">
+                <p class="text-sm text-gray-600">
+                    Working as a <span class="font-semibold">{{ doctor.designation|default:"Medical Officer" }}</span> at <span class="font-semibold">{{ doctor.current_workplace|default:"Renix Unani Laboratories Ltd." }}</span> with {{ doctor.experience_years|default:"2+" }} years of experience.
+                </p>
+            </div>
+
+            <div x-show="activeTab === 'reviews'" x-transition:enter="transition ease-out duration-200" style="display: none;">
+                <p class="text-sm text-gray-600">
+                    Total Rating: <span class="font-bold text-gray-800">{{ doctor.rating|default:"4.80" }}</span> out of {{ doctor.total_reviews|default:"10" }} reviews.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-5" x-show="activeTab === 'info'" x-transition:enter="transition ease-out duration-200">
+            <div class="space-y-4">
+                <h3 class="text-base font-bold text-[#1a73e8] mb-2">At a Glance</h3>
+                
+                <div class="bg-[#f4f7f6] rounded-lg p-4">
+                    <div class="flex items-center gap-2 text-[#1a73e8] font-semibold text-sm">
+                        <i class="fa-solid fa-video text-xs"></i>
+                        <span>Instant Consultation Time</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1 ml-5">
+                        {{ doctor.consultation_time|default:"Sat - Fri (09:00 AM-09:00 PM)" }}
+                    </div>
+                </div>
+
+                <div class="border border-gray-100 rounded-lg p-4 bg-white shadow-sm grid grid-cols-2 gap-y-5 gap-x-4">
+                    <div>
+                        <span class="block text-[11px] text-gray-400 font-medium">Consultation Fee</span>
+                        <span class="text-sm font-bold text-gray-800 mt-0.5 block">
+                            ৳ {{ doctor.consultation_fee|default:"0" }} <span class="text-xs text-gray-400 font-normal">(inc. VAT)</span>
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <span class="block text-[11px] text-gray-400 font-medium">Follow-Up Fee</span>
+                        <span class="text-sm font-bold text-gray-800 mt-0.5 block">
+                            ৳ {{ doctor.follow_up_fee|default:"0" }} <span class="text-[11px] text-gray-400 font-normal">(incl. VAT) <span class="text-gray-500 font-medium">(Within {{ doctor.follow_up_days|default:"60" }} days)</span></span>
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <span class="block text-[11px] text-gray-400 font-medium">Joined Renix Care</span>
+                        <span class="text-sm font-bold text-gray-800 mt-0.5 block">
+                            {{ doctor.user.date_joined|date:"F d, Y"|default:"August 12, 2012" }}
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <span class="block text-[11px] text-gray-400 font-medium">Doctor Code</span>
+                        <span class="text-sm font-bold text-gray-800 mt-0.5 block">
+                            {{ doctor.registration_number|default:"—" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

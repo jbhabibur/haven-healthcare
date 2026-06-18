@@ -25,7 +25,9 @@
   <body class="flex flex-col min-h-screen font-sans text-slate-900 bg-white">
     
     <!-- Header: Navigation and Logo -->
-    {% include "includes/header.html" %}
+    {% block header %}
+        {% include "includes/header.html" %}
+    {% endblock header %}
 
     <!-- Main Content Area: flex-grow ensures the footer stays at the bottom on short pages -->
     <main class="flex-grow">

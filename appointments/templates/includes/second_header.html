@@ -1,0 +1,31 @@
+<!-- templates/includes/second_header.html -->
+<header class="w-full bg-surface-muted border-b border-border px-4 py-3 flex items-center justify-between gap-4 font-sans">
+    
+    <div class="flex items-center gap-4 shrink-0">
+        <a href="#" class="bg-secondary hover:opacity-90 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-opacity">
+            Shop
+        </a>
+        <a href="#" class="text-text-main text-lg font-normal hover:opacity-80 transition-opacity">
+            Home
+        </a>
+    </div>
+
+    <div class="flex-1 max-w-5xl mx-2">
+        <form action="" method="GET" class="w-full">
+            <input 
+                type="text" 
+                name="search" 
+                value="{{ request.GET.search|default:'' }}"
+                placeholder="Search doctor" 
+                class="w-full bg-surface border border-border rounded-md px-4 py-2 text-base text-text-main placeholder-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            >
+        </form>
+    </div>
+
+    <div class="shrink-0">
+        <a href="#" class="bg-primary hover:opacity-95 text-white px-4 py-2 rounded-md text-base font-normal transition-opacity shadow-soft">
+            Login
+        </a>
+    </div>
+    
+</header>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ doctor.user.get_full_name }} - Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', 'Hind Siliguri', sans-serif;
+            background-color: #f7fafc;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 md:p-6">
+            <div class="flex flex-col md:flex-row gap-6">
+                
+                <div class="flex-shrink-0 flex justify-center md:justify-start">
+                    <div class="w-[145px] h-[145px] p-1 border border-gray-200 rounded-lg overflow-hidden bg-white">
+                        {% if doctor.image %}
+                            <img src="{{ doctor.image.url }}" alt="{{ doctor.user.get_full_name }}" class="w-full h-full object-cover rounded-md">
+                        {% else %}
+                            <img src="https://cdn-icons-png.flaticon.com/512/387/387561.png" alt="Default Avatar" class="w-full h-full object-cover rounded-md">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="flex-grow">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+                        {{ doctor.user.get_full_name|default:doctor.user.username }}
+                    </h2>
+                    <p class="text-sm text-gray-500 font-medium mb-2.5">
+                        {{ doctor.degrees|default:"BUMS (Rajshahi Medical University)" }}
+                    </p>
+                    
+                    <div class="mb-3">
+                        <span class="bg-[#689f38] text-white text-xs font-medium px-2 py-1 rounded">
+                            {{ doctor.designation|default:"General Physician (Natural Medicine)" }}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="bg-[#e3efff] text-[#2b6cb0] text-[11px] font-bold px-2 py-0.5 rounded tracking-wide">
+                            Specialty
+                        </span>
+                        <p class="text-sm text-gray-700 font-normal leading-relaxed mt-1.5">
+                            {{ doctor.specialty_description|default:"পাইলস ও কোষ্ঠকাঠিন্য, যৌন ও চর্মরোগ, প্রস্রাব সংক্রান্ত সংক্রমণ, মাসিক সমস্যা, হজমের সমস্যা, সাধারণ দুর্বলতা এবং অন্যান্য সাধারণ স্বাস্থ্য সমস্যার বিশেষজ্ঞ।" }}
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-8 gap-y-2 pt-1 border-t border-gray-50">
+                        <div>
+                            <span class="block text-[11px] text-gray-400 font-medium uppercase tracking-wider">Total Experience</span>
+                            <span class="text-sm font-bold text-gray-800">{{ doctor.experience_years|default:"2+" }} Years</span>
+                        </div>
+                        <div>
+                            <span class="block text-[11px] text-gray-400 font-medium uppercase tracking-wider">Reg. Number</span>
+                            <span class="text-sm font-bold text-gray-800">{{ doctor.registration_number|default:"U-543" }}</span>
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <span class="block text-[11px] text-gray-400 font-medium uppercase tracking-wider">Total Rating</span>
+                            <span class="text-sm font-bold text-gray-800 flex items-center gap-1">
+                                <i class="fa-solid fa-star text-amber-400 text-xs"></i> 
+                                {{ doctor.rating|default:"4.80" }} 
+                                <span class="text-gray-400 font-normal text-xs">({{ doctor.total_reviews|default:"10" }})</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-sm text-gray-500">
+                        Working in <span class="font-semibold text-gray-800">{{ doctor.current_workplace|default:"Renix Unani Laboratories Ltd." }}</span>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-[260px] flex flex-col justify-between items-center md:items-end flex-shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
+                    
+                    <div class="w-full text-center md:text-right relative mb-4 md:mb-0">
+                        <button class="absolute -top-2 right-0 md:relative md:top-0 md:right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Share">
+                            <i class="fa-solid fa-share-nodes text-base"></i>
+                        </button>
+                        
+                        <div class="text-xs text-gray-400 font-medium md:mt-1">Consultation Fee</div>
+                        <div class="text-2xl font-bold text-[#1a73e8] mt-0.5">
+                            ৳ {{ doctor.consultation_fee|default:"0" }} <span class="text-xs text-gray-400 font-normal">(Inc. VAT)</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="bg-[#4fd1c5] hover:bg-[#3bc0b4] text-white text-sm font-medium py-2 px-3 rounded-md flex items-center justify-center gap-1.5 transition-colors">
+                                <i class="fa-solid fa-video text-xs"></i> Video Call
+                            </button>
+                            <button class="bg-[#68d391] hover:bg-[#52c27d] text-white text-sm font-medium py-2 px-3 rounded-md flex items-center justify-center gap-1.5 transition-colors">
+                                <i class="fa-solid fa-microphone text-xs"></i> Voice Call
+                            </button>
+                        </div>
+                        
+                        <a href="{% url 'appointments:book_appointment' %}?doctor_id={{ doctor.id }}" class="w-full bg-[#2b6cb0] hover:bg-[#23578e] text-white text-sm font-semibold py-2 px-4 rounded-md flex items-center justify-center gap-2 transition-colors evaluation-link">
+                            <i class="fa-regular fa-calendar-check"></i> Book Online Appointment
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

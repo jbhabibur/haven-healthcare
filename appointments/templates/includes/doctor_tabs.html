@@ -1,0 +1,25 @@
+<div class="max-w-6xl mx-auto mt-6">
+    <div class="flex gap-2">
+        <button 
+            @click="activeTab = 'info'"
+            :class="activeTab === 'info' ? 'bg-[#689f38] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+            class="text-sm font-medium px-4 py-2 rounded transition-colors duration-200">
+            Info
+        </button>
+        
+        <button 
+            @click="activeTab = 'experience'"
+            :class="activeTab === 'experience' ? 'bg-[#689f38] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+            class="text-sm font-medium px-4 py-2 rounded transition-colors duration-200">
+            Experience
+        </button>
+        
+        <button 
+            @click="activeTab = 'reviews'"
+            :class="activeTab === 'reviews' ? 'bg-[#689f38] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+            class="text-sm font-medium px-4 py-2 rounded transition-colors duration-200">
+            Reviews
+        </button>
+    </div>
+    <hr class="border-gray-200 mt-4">
+</div>

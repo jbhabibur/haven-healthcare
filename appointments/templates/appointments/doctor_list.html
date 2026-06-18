@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %} Doctor List - Haven Healthcare Center {% endblock title %}
+
+# Header
+{% comment %} Header {% endcomment %}
+{% block header %}
+    {% include 'includes/second_header.html' %}
+{% endblock header %}
+
+# Main content block for doctor listing page
+{% block content %} 
+    <main class="min-h-screen bg-surface px-4 py-8 md:px-12 font-sans">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-semibold text-text-main tracking-wide">Doctors List</h1>
+            <p class="text-text-muted mt-1 text-sm md:text-base flex items-center justify-center gap-3 flex-wrap">
+                <span>Helpline - </span>
+                <span class="text-border hidden sm:inline">•</span>
+
+                <a href="https://wa.me/8801661532" target="_blank" class="inline-flex items-center gap-1 text-secondary font-medium hover:underline">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397 0 11.93 0c3.165.001 6.14 1.233 8.377 3.473 2.238 2.24 3.467 5.214 3.466 8.379-.004 6.582-5.34 11.931-11.873 11.931-2.006-.001-3.975-.51-5.729-1.482L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.74 1.451 5.436 0 9.86-4.42 9.863-9.864.001-2.637-1.03-5.114-2.905-6.99C16.41 1.86 13.935 1.83 11.93 1.83c-5.438 0-9.863 4.421-9.865 9.865 0 1.657.443 3.275 1.285 4.693l-.992 3.626 3.71-.973zm11.336-6.196c-.3-.15-1.774-.875-2.046-.975-.272-.1-.47-.15-.667.15-.197.3-.762.975-.934 1.175-.172.2-.343.225-.643.075-.3-.15-1.267-.467-2.413-1.491-.892-.797-1.493-1.782-1.668-2.082-.176-.3-.018-.462.13-.61.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5s.05-.375-.025-.525C10.044 7.226 9.4 5.65 9.13 5c-.264-.634-.532-.547-.733-.558-.19-.01-.407-.012-.624-.012s-.57.082-.868.407c-.297.325-1.134 1.109-1.134 2.703 0 1.593 1.157 3.13 1.319 3.354.163.224 2.277 3.477 5.517 4.878.77.333 1.37.532 1.839.68.774.246 1.478.211 2.035.128.621-.093 1.774-.725 2.022-1.425.247-.699.247-1.299.173-1.425-.074-.124-.272-.2-.572-.35z"/>
+                    </svg>
+                    <span>WhatsApp (+880 16211-61532)</span>
+                </a>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
+            
+            {% for doctor in doctors %}
+                <div class="group relative bg-surface-muted rounded-xl shadow-soft p-5 flex flex-col sm:flex-row justify-between gap-4 border border-border hover:shadow-md transition-shadow cursor-pointer">
+                    
+                    <div class="flex flex-col items-center shrink-0">
+                        <div class="w-24 h-24 bg-surface rounded-lg overflow-hidden border border-border">
+                            {% if doctor.image %}
+                                <img src="{{ doctor.image.url }}" alt="{{ doctor.user.get_full_name }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <img src="https://via.placeholder.com/150" alt="{{ doctor.user.get_full_name }}" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+                        <p class="text-sm font-semibold text-text-main mt-3 text-center">{{ doctor.total_experience_years }}</p>
+                        <p class="text-xs text-text-muted text-center">Experience</p>
+                    </div>
+
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h2 class="text-lg font-bold text-text-main">
+                                    <a href="{% url 'appointments:doctor_detail' doctor.pk %}" class="after:absolute after:inset-0 after:z-10 hover:text-primary transition-colors">
+                                        Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
+                                    </a>
+                                </h2>
+                                
+                                {% if doctor.is_available %}
+                                    <span class="bg-[rgba(6,214,160,0.12)] text-success text-[10px] font-semibold px-2.5 py-0.5 rounded-full">Available</span>
+                                {% else %}
+                                    <span class="bg-border text-text-muted text-[10px] font-semibold px-2.5 py-0.5 rounded-full">Offline</span>
+                                {% endif %}
+                            </div>
+                            
+                            <p class="text-xs text-text-muted mt-1.5 leading-relaxed">
+                                {{ doctor.qualification|default:"Qualifications not added yet" }}
+                            </p>
+                            
+                            <div class="mt-2.5">
+                                <span class="bg-[rgba(61,90,128,0.08)] text-primary text-[11px] font-semibold px-2.5 py-1 rounded">
+                                    {{ doctor.specialization|default:"General Physician" }}
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center gap-1 mt-3">
+                                <span class="text-warning text-sm">★</span>
+                                <span class="text-sm font-bold text-text-main">{{ doctor.average_rating }}</span>
+                                <span class="text-xs text-text-muted">({{ doctor.total_reviews_count }})</span>
+                            </div>
+                            
+                            <p class="text-xs text-text-muted mt-3">
+                                Working at 
+                                <span class="font-medium text-text-main">
+                                    {% if doctor.experiences.all %}
+                                        {{ doctor.experiences.first.institution_name }}
+                                    {% else %}
+                                        Private Practice
+                                    {% endif %}
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-4 mt-4 pt-3 border-t border-border text-xs font-semibold relative z-20">
+                            
+                            {% if has_active_appointment %}
+                                <button class="flex items-center gap-1.5 text-secondary hover:opacity-80 transition-opacity">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                                    Video Call
+                                </button>
+                                <button class="flex items-center gap-1.5 text-secondary hover:opacity-80 transition-opacity">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-1C7.82 18 2 12.18 2 5V3z"></path></svg>
+                                    Voice Call
+                                </button>
+                            {% else %}
+                                <button disabled class="flex items-center gap-1.5 text-text-muted opacity-50 cursor-not-allowed" title="Book an appointment to unlock consultation calls">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                                    Video Call
+                                </button>
+                                <button disabled class="flex items-center gap-1.5 text-text-muted opacity-50 cursor-not-allowed" title="Book an appointment to unlock consultation calls">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-1C7.82 18 2 12.18 2 5V3z"></path></svg>
+                                    Voice Call
+                                </button>
+                            {% endif %}
+                            
+                        </div>
+                    </div>
+
+                    <div class="bg-surface rounded-xl border border-border p-4 flex flex-col justify-between items-center text-center shrink-0 min-w-[140px] sm:self-stretch relative z-20">
+                        <div>
+                            <div class="text-2xl font-black text-primary tracking-tight leading-none">৳{{ doctor.consultation_fee|floatformat:"0" }}</div>
+                            <p class="text-[10px] text-text-muted mt-1">(Inc. VAT)</p>
+                            
+                            <div class="bg-[rgba(6,214,160,0.12)] text-success text-[10px] font-bold px-2.5 py-0.5 rounded-full mt-3 inline-block whitespace-nowrap">
+                                Per Consultation
+                            </div>
+                        </div>
+                        
+                        <div class="w-full mt-4">
+                            <a href="#" class="block w-full text-center bg-primary hover:opacity-90 text-white font-semibold text-xs py-2.5 px-3 rounded-lg shadow-sm transition-opacity whitespace-nowrap">
+                                Make Appointment
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12 bg-surface-muted rounded-xl shadow-soft border border-border">
+                    <p class="text-text-muted">No doctors found at the moment.</p>
+                </div>
+            {% endfor %}
+
+        </div>
+    </main>
+{% endblock content %}

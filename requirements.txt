@@ -3,6 +3,7 @@ psycopg2-binary
 python-dotenv
 django-tailwind
 django-browser-reload
-
 cloudinary
 django-cloudinary-storage
+Pillow
+python-dateutil

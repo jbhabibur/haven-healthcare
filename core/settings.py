@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'accounts.apps.AccountsConfig',
     'products.apps.ProductsConfig',
+    'appointments.apps.AppointmentsConfig',
 ]
 
 MIDDLEWARE = [
