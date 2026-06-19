@@ -1,0 +1,129 @@
+<div 
+    x-show="openEditModal" 
+    class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none"
+    style="display: none;"
+    x-cloak
+>
+    <div 
+        @click="openEditModal = false" 
+        class="fixed inset-0 bg-black/50 transition-opacity"
+    ></div>
+
+    <div class="relative w-full max-w-lg mx-auto my-6 p-6 bg-surface rounded-xl shadow-xl border border-border z-10 max-h-[90vh] overflow-y-auto">
+        
+        <div class="flex items-center justify-between pb-4 border-b border-border">
+            <h3 class="text-lg font-bold text-text-main">✏️ Edit Profile Information</h3>
+            <button 
+                @click="openEditModal = false" 
+                type="button" 
+                class="text-text-muted hover:text-text-main font-bold text-xl cursor-pointer"
+            >&times;</button>
+        </div>
+        
+        <form method="POST" action="" enctype="multipart/form-data" class="py-4 space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-xs font-semibold uppercase text-text-muted mb-1">Specialization</label>
+                <input 
+                    type="text" 
+                    name="specialization" 
+                    value="{{ doctor_profile.specialization|default:'' }}"
+                    class="w-full px-3 py-2 bg-surface border border-border/80 rounded-lg text-sm text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    placeholder="e.g. Cardiologist"
+                >
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-text-muted mb-1">Consultation Fee (৳)</label>
+                    <input 
+                        type="number" 
+                        name="consultation_fee" 
+                        value="{{ doctor_profile.consultation_fee|default:'0' }}"
+                        class="w-full px-3 py-2 bg-surface border border-border/80 rounded-lg text-sm text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    >
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-text-muted mb-1">Follow-up Fee (৳)</label>
+                    <input 
+                        type="number" 
+                        name="follow_up_fee" 
+                        value="{{ doctor_profile.follow_up_fee|default:'0' }}"
+                        class="w-full px-3 py-2 bg-surface border border-border/80 rounded-lg text-sm text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    >
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-text-muted mb-1">Follow-up Validity (Days)</label>
+                    <input 
+                        type="number" 
+                        name="follow_up_validity_days" 
+                        value="{{ doctor_profile.follow_up_validity_days|default:'0' }}"
+                        class="w-full px-3 py-2 bg-surface border border-border/80 rounded-lg text-sm text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    >
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-text-muted mb-1">Experience (Years)</label>
+                    <input 
+                        type="number" 
+                        name="total_experience_years" 
+                        value="{{ doctor_profile.total_experience_years|default:'0' }}"
+                        class="w-full px-3 py-2 bg-surface border border-border/80 rounded-lg text-sm text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase text-text-muted mb-1">Qualifications</label>
+                <input 
+                    type="text" 
+                    name="qualification" 
+                    value="{{ doctor_profile.qualification|default:'' }}"
+                    class="w-full px-3 py-2 bg-surface border border-border/80 rounded-lg text-sm text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    placeholder="e.g. MBBS, FCPS"
+                >
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase text-text-muted mb-1">Intro & Services</label>
+                <textarea 
+                    name="doctor_info" 
+                    rows="3"
+                    class="w-full px-3 py-2 bg-surface border border-border/80 rounded-lg text-sm text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    placeholder="Tell patients about your services..."
+                >{{ doctor_profile.doctor_info|default:'' }}</textarea>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+                <input 
+                    type="checkbox" 
+                    name="is_available" 
+                    id="is_available"
+                    {% if doctor_profile.is_available %}checked{% endif %}
+                    class="h-4 w-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
+                >
+                <label for="is_available" class="text-sm font-medium text-text-main cursor-pointer">Available for Consultation</label>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-border flex justify-end gap-3">
+                <button 
+                    @click="openEditModal = false" 
+                    type="button" 
+                    class="px-4 py-2 bg-surface border border-border hover:bg-surface-muted text-text-main text-sm font-medium rounded-lg transition"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="submit" 
+                    class="px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition shadow-sm"
+                >
+                    Save Changes
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>

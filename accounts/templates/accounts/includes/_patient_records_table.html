@@ -1,0 +1,66 @@
+<div class="bg-[var(--color-surface-muted)] shadow-[0_4px_24px_-1px_rgba(0,0,0,0,0.05)] p-5 rounded-xl border border-[var(--color-border)] overflow-hidden">
+    <div class="px-6 py-5 border-b border-[var(--color-border)] flex justify-between items-center">
+        <h3 class="text-xl font-semibold text-[var(--color-primary)]">Patient Records & History</h3>
+        <span class="bg-blue-100 text-[var(--color-primary)] text-xs font-semibold px-2.5 py-0.5 rounded-full">Total Patients: {{ patients|length }}</span>
+    </div>
+
+    {% if patients %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-[var(--color-border)]">
+                    <th class="px-6 py-4 text-xs font-semibold tracking-wider text-[var(--color-text-muted)] uppercase">Patient Name</th>
+                    <th class="px-6 py-4 text-xs font-semibold tracking-wider text-[var(--color-text-muted)] uppercase">Contact Info</th>
+                    <th class="px-6 py-4 text-xs font-semibold tracking-wider text-[var(--color-text-muted)] uppercase">Age & Blood</th>
+                    <th class="px-6 py-4 text-xs font-semibold tracking-wider text-[var(--color-text-muted)] uppercase">Medical History</th>
+                    <th class="px-6 py-4 text-xs font-semibold tracking-wider text-[var(--color-text-muted)] uppercase">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--color-border)]">
+                {% for patient in patients %}
+                <tr class="hover:bg-gray-50/50 transition">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-medium text-[var(--color-text-main)]">{{ patient }}</div>
+                        <div class="text-xs text-[var(--color-text-muted)]">Username: {{ patient.user.username }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-[var(--color-text-main)]">{{ patient.phone_number|default:"N/A" }}</div>
+                        <div class="text-xs text-[var(--color-text-muted)]">Joined: {{ patient.created_at|date:"M d, Y" }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-[var(--color-text-main)]">Age: {{ patient.age|default:"N/A" }}</div>
+                        {% if patient.blood_group %}
+                        <span class="inline-block mt-1 text-xs font-semibold px-2 py-0.5 bg-red-50 text-red-600 rounded">
+                            {{ patient.blood_group }}
+                        </span>
+                        {% else %}
+                        <span class="text-xs text-[var(--color-text-muted)]">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 max-w-xs">
+                        <p class="text-sm text-[var(--color-text-main)] line-clamp-2" title="{{ patient.medical_history }}">
+                            {{ patient.medical_history|default:"No medical history recorded." }}
+                        </p>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if patient.is_approved %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                            Approved
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            Pending Approval
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-[var(--color-text-muted)] text-base">No patients registered in the system yet.</p>
+    </div>
+    {% endif %}
+</div>

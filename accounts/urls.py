@@ -25,5 +25,14 @@ urlpatterns = [
     path('password-reset-confirm/<uidb64>/<token>/', MyPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password-reset-complete/', MyPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
+    # --- Profile Management ---
+    # Central profile endpoint that handles routing based on user roles
+    path('profile/', views.profile_redirect_view, name='profile'),
+    
+    # Role-specific profile views
+    path('profile/doctor/', views.doctor_profile_view, name='doctor_profile'),
+    path('profile/patient/', views.patient_profile_view, name='patient_profile'),
+
+    # --- AJAX & Other Actions ---
     path('profile/update-phone/', views.update_phone_ajax, name='update_phone'),
 ]

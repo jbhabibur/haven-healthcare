@@ -1,0 +1,89 @@
+<div class="bg-surface-muted shadow-soft rounded-xl border border-border p-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-5 border-b border-border mb-5 gap-3">
+        <div>
+            <h3 class="text-lg font-bold text-text-main">Appointment History</h3>
+            <p class="text-xs text-text-muted mt-0.5">Manage and track your upcoming and past medical consultations.</p>
+        </div>
+        
+        <div class="inline-flex rounded-lg bg-surface p-0.5 border border-border/80">
+            <span class="px-3 py-1 text-xs font-semibold rounded-md bg-primary text-white shadow-sm">All Bookings</span>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-border/60 bg-surface/50 text-xs font-bold uppercase tracking-wider text-text-muted">
+                    <th class="py-3 px-4">Doctor Details</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Time Slot</th>
+                    <th class="py-3 px-4">Type</th>
+                    <th class="py-3 px-4">Payment</th>
+                    <th class="py-3 px-4 text-right">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border/40 text-sm">
+                {% for appointment in appointments %}
+                <tr class="hover:bg-surface/30 transition-colors">
+                    <td class="py-3.5 px-4">
+                        <div class="font-semibold text-text-main">
+                            Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}
+                        </div>
+                        <div class="text-xs text-text-muted mt-0.5">
+                            {{ appointment.doctor.specialization|default:"General Consultant" }}
+                        </div>
+                    </td>
+                    
+                    <td class="py-3.5 px-4 text-text-main/90 font-medium">
+                        {{ appointment.date }}
+                    </td>
+                    
+                    <td class="py-3.5 px-4 text-text-muted font-mono text-xs">
+                        {{ appointment.time_slot|default:appointment.time }}
+                    </td>
+                    
+                    <td class="py-3.5 px-4">
+                        {% if appointment.is_follow_up %}
+                            <span class="text-xs font-medium text-secondary bg-secondary/10 px-2 py-0.5 rounded">Follow-up</span>
+                        {% else %}
+                            <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">New Consultation</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td class="py-3.5 px-4">
+                        {% if appointment.is_paid %}
+                            <span class="text-xs font-semibold text-success flex items-center gap-1">
+                                <span class="h-1.5 w-1.5 rounded-full bg-success"></span> Fully Paid
+                            </span>
+                        {% else %}
+                            <span class="text-xs font-semibold text-error flex items-center gap-1">
+                                <span class="h-1.5 w-1.5 rounded-full bg-error"></span> Pending
+                            </span>
+                        {% endif %}
+                    </td>
+                    
+                    <td class="py-3.5 px-4 text-right">
+                        {% if appointment.status == 'COMPLETED' or appointment.status == 'Completed' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">Completed</span>
+                        {% elif appointment.status == 'PENDING' or appointment.status == 'Pending' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning">Pending</span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info">Confirmed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="py-12 text-center">
+                        <svg class="h-10 w-10 text-text-muted/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-sm font-medium text-text-muted">No appointments found.</p>
+                        <p class="text-xs text-text-muted/60 mt-0.5">Your scheduled booking logs will appear here when added.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

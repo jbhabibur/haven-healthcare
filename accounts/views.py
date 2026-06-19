@@ -15,11 +15,15 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from .forms import CustomUserCreationForm
-from .models import PatientProfile
+from .models import PatientProfile, DoctorProfile
+from django.contrib import messages
 
 # --- Authentication & Registration ---
 
 class SignUpView(CreateView):
+    """
+    Handles user user registration using the custom user creation form.
+    """
     form_class = CustomUserCreationForm
     template_name = 'accounts/registration/signup.html'
     success_url = reverse_lazy('accounts:login') 
@@ -31,19 +35,29 @@ class SignUpView(CreateView):
 
 
 class MyLoginView(LoginView):
+    """
+    Handles user login authentication.
+    """
     template_name = 'accounts/registration/login.html'
 
     def get_success_url(self):
+        # Redirect directly to home page or custom dashboard after a successful login
         return reverse_lazy('home')
 
 
 class MyLogoutView(LogoutView):
+    """
+    Handles user logout session destruction.
+    """
     next_page = reverse_lazy('accounts:login')
 
 
 # --- Password Reset Flow ---
 
 class MyPasswordResetView(PasswordResetView):
+    """
+    Initiates the password reset process by accepting an email.
+    """
     template_name = 'accounts/registration/password_reset_form.html'
     email_template_name = 'accounts/registration/password_reset_email.html'
     html_email_template_name = 'accounts/registration/password_reset_email.html'
@@ -51,15 +65,24 @@ class MyPasswordResetView(PasswordResetView):
 
 
 class MyPasswordResetDoneView(PasswordResetDoneView):
+    """
+    Displays a success message indicating that a reset email has been sent.
+    """
     template_name = 'accounts/registration/password_reset_done.html'
 
 
 class MyPasswordResetConfirmView(PasswordResetConfirmView):
+    """
+    Validates the unique link sent via email and allows entering a new password.
+    """
     template_name = 'accounts/registration/password_reset_confirm.html'
     success_url = reverse_lazy('accounts:password_reset_complete')
 
 
 class MyPasswordResetCompleteView(PasswordResetCompleteView):
+    """
+    Displays confirmation that the password has been successfully updated.
+    """
     template_name = 'accounts/registration/password_reset_complete.html'
 
 
@@ -69,20 +92,20 @@ class MyPasswordResetCompleteView(PasswordResetCompleteView):
 @require_POST
 def update_phone_ajax(request):
     """
-    অ্যাপয়েন্টমেন্ট পেজ থেকে লগইন করা পেশেন্টের ফোন নাম্বার 
-    AJAX এর মাধ্যমে তাৎক্ষণিক আপডেট করার ভিউ।
+    AJAX view to instantly update the logged-in patient's phone number 
+    from the appointment page.
     """
     try:
         data = json.loads(request.body)
         new_phone = data.get('phone_number', '').strip()
         
         if not new_phone:
-            return JsonResponse({'success': False, 'error': 'ফোন নাম্বার খালি রাখা যাবে না।'}, status=400)
+            return JsonResponse({'success': False, 'error': 'Phone number cannot be empty.'}, status=400)
             
-        # পেশেন্টের প্রোফাইল খুঁজে বের করা বা না থাকলে তৈরি করা
+        # Get patient profile or create one if it doesn't exist
         profile, created = PatientProfile.objects.get_or_create(user=request.user)
         
-        # নতুন নাম্বার সেট করে মডেল ভ্যালিডেশন রান করানো (Regex & Unique চেক করার জন্য)
+        # Set new phone number and run model validation (for Regex & Unique constraints)
         profile.phone_number = new_phone
         profile.full_clean() 
         profile.save()
@@ -90,9 +113,89 @@ def update_phone_ajax(request):
         return JsonResponse({'success': True, 'phone_number': profile.phone_number})
         
     except ValidationError as e:
-        # মডেলের RegexValidator বা unique ট্রিলারে যে এরর আসবে তা ফ্রন্টএন্ডে পাঠানো
-        error_msg = e.message_dict.get('phone_number', ['ভুল ডাটা দেওয়া হয়েছে।'])[0]
+        # Return validation errors (e.g., from RegexValidator or unique constraints) to the frontend
+        error_msg = e.message_dict.get('phone_number', ['Invalid data provided.'])[0]
         return JsonResponse({'success': False, 'error': error_msg}, status=400)
         
     except Exception as e:
-        return JsonResponse({'success': False, 'error': 'সার্ভারে কোনো সমস্যা হয়েছে। আবার চেষ্টা করুন।'}, status=500)
+        return JsonResponse({'success': False, 'error': 'An internal server error occurred. Please try again.'}, status=500)
+
+
+# --- Profile Management ---
+
+@login_required
+def profile_redirect_view(request):
+    """
+    Checks the user's role and redirects them to the appropriate profile URL.
+    """
+    # Check if the logged-in user is a doctor
+    if getattr(request.user, 'is_doctor', False):
+        return redirect('accounts:doctor_profile')
+        
+    # Check if the logged-in user is a patient
+    elif getattr(request.user, 'is_patient', False):
+        return redirect('accounts:patient_profile')
+    
+    # Fallback to home page if no specific role matches (e.g., admin)
+    return redirect('home')
+
+
+@login_required
+def doctor_profile_view(request):
+    """
+    Renders the doctor dashboard displaying profile details, 
+    allowing updates, and showing patient records.
+    """
+    # 1. Fetch the logged-in user's doctor profile, or create one if it doesn't exist
+    doctor_profile, created = DoctorProfile.objects.get_or_create(user=request.user)
+    
+    # 2. Handle profile updates when the form is submitted via POST
+    if request.method == 'POST':
+        doctor_profile.specialization = request.POST.get('specialization', '').strip()
+        doctor_profile.registration_number = request.POST.get('registration_number', '').strip()
+        
+        # Handle validation for numeric fields
+        try:
+            doctor_profile.consultation_fee = request.POST.get('consultation_fee') or 0.00
+            doctor_profile.follow_up_fee = request.POST.get('follow_up_fee') or 0.00
+            doctor_profile.follow_up_validity_days = request.POST.get('follow_up_validity_days') or 14
+        except (ValueError, TypeError):
+            pass
+            
+        doctor_profile.qualification = request.POST.get('qualification', '').strip()
+        doctor_profile.doctor_info = request.POST.get('doctor_info', '').strip()
+        
+        # Set boolean value for the availability checkbox
+        doctor_profile.is_available = 'is_available' in request.POST
+        
+        # Handle image uploads (compatible with Cloudinary)
+        if 'image' in request.FILES:
+            doctor_profile.image = request.FILES['image']
+            
+        # Save updated data to the database
+        doctor_profile.save()
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('accounts:doctor_profile')
+
+    # 3. Fetch patient records using an optimized query
+    patients = PatientProfile.objects.select_related('user').all().order_by('-created_at')
+    
+    context = {
+        'doctor_profile': doctor_profile,
+        'patients': patients,
+    }
+    return render(request, 'accounts/doctor_profile.html', context)
+
+
+@login_required
+def patient_profile_view(request):
+    """
+    Renders the dashboard customized for the patient by fetching data from the database.
+    """
+    # Dynamic database instance target setup
+    patient_profile, created = PatientProfile.objects.get_or_create(user=request.user)
+    
+    context = {
+        'patient_profile': patient_profile,
+    }
+    return render(request, 'accounts/patient_profile.html', context)
