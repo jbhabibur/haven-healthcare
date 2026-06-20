@@ -1,7 +1,6 @@
 <nav
   class="flex items-center justify-between py-2 bg-white px-4 shadow-sm relative"
 >
-  <!-- Left Side: Navigation Links -->
   <ul class="flex items-center space-x-4 text-[15px] font-medium">
     <li>
       <a href="/" class="text-red-400 hover:text-red-600 transition-colors"
@@ -16,7 +15,6 @@
       >
     </li>
 
-    <!-- Dropdown Menu: Unani Medicine -->
     <li
       class="relative group"
       x-data="{ open: false }"
@@ -34,7 +32,6 @@
         ></i>
       </button>
 
-      <!-- Dropdown Box -->
       <div
         x-show="open"
         x-transition:enter="transition ease-out duration-200"
@@ -79,7 +76,6 @@
       </div>
     </li>
 
-    <!-- Dropdown Menu: Health & Wellness -->
     <li
       class="relative group"
       x-data="{ open: false }"
@@ -97,7 +93,6 @@
         ></i>
       </button>
 
-      <!-- Dropdown Box -->
       <div
         x-show="open"
         x-transition:enter="transition ease-out duration-200"
@@ -165,9 +160,7 @@
     </li>
   </ul>
 
-  <!-- Right Side: Search, Cart, and User -->
   <div class="flex items-center space-x-6">
-    <!-- Search Bar -->
     <div
       class="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden h-10 focus-within:border-accent transition-all"
     >
@@ -188,11 +181,22 @@
       </div>
     </div>
 
-    <!-- Cart Icon -->
-    <div class="relative group cursor-pointer w-fit" x-data="{ cartCount: 0 }">
+    <div class="relative group cursor-pointer w-fit" 
+         x-data="{ cartCount: 0 }"
+         x-init="
+            {% if request.session.cart %}
+                let total = 0;
+                {% for key, val in request.session.cart.items %}
+                    total += parseInt('{{ val }}') || 0;
+                {% endfor %}
+                cartCount = total;
+            {% else %}
+                cartCount = 0;
+            {% endif %}
+         "
+         @cart-updated.window="cartCount = $event.detail.count">
       <a
-        href="#"
-        @click.prevent="console.log('Cart clicked')"
+        href="{% url 'products:cart_detail' %}"
         class="text-primary hover:text-accent transition-colors flex items-center justify-center"
       >
         <div class="w-8 h-8 flex items-center justify-center">
@@ -206,10 +210,8 @@
       </a>
     </div>
 
-    <!-- User Section -->
     <div class="relative" x-data="{ userOpen: false }">
       {% if user.is_authenticated %}
-      <!-- Profile Icon (First Letter of Username) -->
       <button
         @click="userOpen = !userOpen"
         @click.away="userOpen = false"
@@ -218,7 +220,6 @@
         {{ user.username.0 }}
       </button>
 
-      <!-- User Dropdown Menu -->
       <div
         x-show="userOpen"
         x-transition:enter="transition ease-out duration-200"
@@ -241,7 +242,6 @@
           <i class="fa-regular fa-user mr-2"></i> My Profile
         </a>
 
-        <!-- Logout Form (Required POST method for Django 5.0+) -->
         <form
           action="{% url 'accounts:logout' %}"
           method="post"
@@ -258,7 +258,6 @@
       </div>
 
       {% else %}
-      <!-- Guest User Login/Signup Icon -->
       <a
         href="{% url 'accounts:signup' %}"
         class="text-primary hover:text-accent transition-colors flex items-center justify-center"

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-slate-50 min-h-screen py-10">
+    <div class="container mx-auto px-4 max-w-6xl">
+        
+        <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                <span class="p-2.5 bg-accent/10 text-accent rounded-xl inline-flex items-center justify-center">
+                    <i class="fa-solid fa-cart-shopping text-xl sm:text-2xl"></i>
+                </span> 
+                Shopping Cart
+            </h1>
+            {% if cart_items %}
+            <span class="text-sm font-semibold bg-gray-200/70 text-gray-700 px-3 py-1 rounded-full">
+                {{ cart_items|length }} Item{{ cart_items|length|pluralize }}
+            </span>
+            {% endif %}
+        </div>
+
+        {% if cart_items %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <div class="lg:col-span-2 space-y-4">
+                {% for item in cart_items %}
+                <div class="group relative grid grid-cols-1 sm:grid-cols-12 items-center p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 gap-4">
+                    
+                    <div class="sm:col-span-6 flex items-center gap-4">
+                        <div class="w-20 h-20 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center p-2 flex-shrink-0">
+                            {% if item.product.primary_image %}
+                                <img src="{{ item.product.primary_image.url }}" alt="{{ item.product.name }}" class="max-h-full max-w-full object-contain">
+                            {% else %}
+                                <div class="flex flex-col items-center justify-center text-gray-300 gap-1">
+                                    <i class="fa-solid fa-prescription-bottle-medical text-lg"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="space-y-0.5 min-w-0">
+                            <h3 class="font-bold text-gray-800 text-base group-hover:text-accent transition-colors duration-200 leading-snug truncate">
+                                {{ item.product.name }}
+                            </h3>
+                            <p class="text-xs font-medium text-gray-400 truncate">
+                                <i class="fa-solid fa-industry text-[10px]"></i> {{ item.product.manufacturer.name }}
+                            </p>
+                            <p class="text-xs font-bold text-gray-500 pt-0.5">
+                                ৳{{ item.product.selling_price }} <span class="font-normal text-gray-400">/ unit</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2 flex justify-start sm:justify-center">
+                        <div class="text-xs text-gray-500 font-medium bg-gray-50 px-2.5 py-1.5 rounded-lg border border-gray-100 text-center whitespace-nowrap">
+                            Qty: <span class="font-extrabold text-gray-900 text-sm">{{ item.quantity }}</span>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3 text-left sm:text-right">
+                        <span class="text-xs text-gray-400 sm:hidden block font-medium">Total:</span>
+                        <span class="text-base font-black text-gray-900 tracking-tight">৳{{ item.total_price }}</span>
+                    </div>
+
+                    <div class="sm:col-span-1 flex justify-end">
+                        <form action="{% url 'products:remove_from_cart' item.product.id %}" method="post" class="m-0 inline-block">
+                            {% csrf_token %}
+                            <button type="submit" class="text-gray-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 border border-transparent hover:border-red-100 transition-all duration-200" title="Remove Item">
+                                <i class="fa-solid fa-trash-can text-base"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+                {% endfor %}
+                
+                <div class="pt-3">
+                    <a href="{% url 'products:category_products' 'shop' %}" class="inline-flex items-center text-sm font-bold text-primary hover:text-accent transition-all duration-200 gap-2 group/btn">
+                        <i class="fa-solid fa-arrow-left transition-transform group-hover/btn:-translate-x-1"></i> 
+                        Continue Shopping Medicines
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-6">
+                <h2 class="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3">
+                    <i class="fa-solid fa-receipt text-gray-400"></i> Order Summary
+                </h2>
+                
+                <div class="space-y-4 text-sm text-gray-600 mb-6">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Subtotal</span>
+                        <span class="font-bold text-gray-900 text-base">৳{{ subtotal }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Estimated Delivery</span>
+                        {% if delivery_charge > 0 %}
+                            <span class="font-bold text-gray-900 text-base">৳{{ delivery_charge }}</span>
+                        {% else %}
+                            <span class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md text-xs">FREE</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="border-t border-dashed border-gray-200 pt-4 flex justify-between items-center text-base font-bold text-gray-900">
+                        <span>Total Payable</span>
+                        <span class="text-xl font-black text-accent tracking-tight">৳{{ total }}</span>
+                    </div>
+                </div>
+
+                <a href="#" class="block w-full bg-accent hover:bg-accent/90 text-white text-center py-3.5 rounded-xl font-bold text-sm tracking-wide shadow-md transition-all duration-200">
+                    Proceed to Secure Checkout <i class="fa-solid fa-chevron-right ml-1 text-xs"></i>
+                </a>
+                
+                <div class="mt-5 pt-4 border-t border-gray-50 flex items-center justify-center gap-3 text-[11px] font-medium text-gray-400">
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> Secure Gateway</span>
+                    <span class="text-gray-200">|</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-truck-droplet text-blue-500"></i> Fast Logistics</span>
+                </div>
+            </div>
+
+        </div>
+        {% else %}
+        <div class="text-center py-16 bg-white border border-gray-100 rounded-3xl shadow-sm max-w-md mx-auto my-6 px-6">
+            <div class="w-24 h-24 bg-slate-50 text-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <i class="fa-solid fa-basket-shopping text-4xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-gray-800 mb-2 tracking-tight">Your Cart is Empty!</h2>
+            <p class="text-sm text-gray-400 mb-8 max-w-xs mx-auto leading-relaxed">
+                Looks like you haven't added any prescription medicines or healthcare essentials yet.
+            </p>
+            <a href="{% url 'products:category_products' 'shop' %}" class="bg-primary hover:bg-accent text-white px-8 py-3 rounded-xl text-sm font-bold transition-all duration-200 inline-block shadow-md">
+                Browse Pharmacy Catalog
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
