@@ -1,4 +1,70 @@
-<div class="flex flex-col h-full bg-[var(--color-surface-muted)] border border-[var(--color-border)] rounded p-4 text-center justify-between shadow-sm hover:shadow-md transition-shadow">
+<div class="flex flex-col h-full bg-[var(--color-surface-muted)] border border-[var(--color-border)] rounded p-4 text-center justify-between shadow-sm hover:shadow-md transition-shadow"
+     x-data="{ 
+        qty: 1, 
+        maxStock: parseInt('{{ product.stock_quantity }}') || 0,
+        
+        addToCart() {
+            const productData = {
+                id: '{{ product.id }}',
+                quantity: this.qty
+            };
+
+            // 1. Collect Django CSRF Token from the DOM
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (!csrfToken) {
+                csrfToken = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('csrftoken='))
+                    ?.split('=')[1];
+            }
+
+            if (!csrfToken) {
+                alert('Security Error: CSRF token missing!');
+                return;
+            }
+
+            // 2. Sending request to the correct namespaced URL 'products:add_to_cart'
+            fetch('{% url 'products:add_to_cart' %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(productData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    
+                    // Optional local frontend Redux/Cart store sync if needed
+                    if (window.cartStore && window.addCartItemAction) {
+                        const reduxData = {
+                            id: '{{ product.id }}',
+                            name: '{{ product.name }}',
+                            price: parseFloat('{{ product.selling_price }}'),
+                            image: '{% if product.primary_image %}{{ product.primary_image.url }}{% endif %}',
+                            maxStock: this.maxStock,
+                            quantity: this.qty
+                        };
+                        window.cartStore.dispatch(window.addCartItemAction(reduxData));
+                    }
+                    
+                    // Dispatch global event to instantly update navbar counter without refreshing
+                    window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: data.total_items } }));
+                }
+            })
+            .catch(error => {
+                alert(error.message || 'Something went wrong while adding the product!');
+            });
+        }
+     }">
+  
   <div>
     <div class="w-full h-48 flex items-center justify-center mb-4 bg-[var(--color-surface-muted)]">
       {% if product.primary_image %}
@@ -68,15 +134,34 @@
   <div class="grid grid-cols-2 gap-2 mt-auto">
     <button
       type="button"
-      class="w-full bg-[var(--color-secondary)] hover:opacity-90 text-white text-xs font-bold py-2 px-1 rounded transition-colors uppercase whitespace-nowrap"
+      @click="addToCart()"
+      {% if product.stock_quantity == 0 %}
+        disabled 
+        class="w-full bg-[var(--color-text-muted)] opacity-50 text-white text-xs font-bold py-2 px-1 rounded uppercase whitespace-nowrap cursor-not-allowed"
+      {% else %}
+        class="w-full bg-[var(--color-secondary)] hover:opacity-90 text-white text-xs font-bold py-2 px-1 rounded transition-colors uppercase whitespace-nowrap cursor-pointer"
+      {% endif %}
     >
       Add to Cart
     </button>
-    <a
-      href="{% url 'products:medicine_detail' product.slug %}"
-      class="w-full bg-[var(--color-accent)] hover:opacity-90 text-white text-xs font-bold py-2 px-1 rounded transition-colors uppercase whitespace-nowrap flex items-center justify-center"
-    >
-      Order Now
-    </a>
+
+    <form action="{% url 'payments:stripe-checkout' %}" method="POST" class="m-0 inline-block w-full">
+      {% csrf_token %}
+      <input type="hidden" name="product_id" value="{{ product.id }}">
+      <input type="hidden" name="quantity" value="1">
+      
+      <button
+        type="submit"
+        {% if product.stock_quantity == 0 %}
+          disabled 
+          class="w-full bg-[var(--color-text-muted)] opacity-50 text-white text-xs font-bold py-2 px-1 rounded uppercase whitespace-nowrap cursor-not-allowed flex items-center justify-center gap-1"
+        {% else %}
+          class="w-full bg-[var(--color-accent)] hover:opacity-90 text-white text-xs font-bold py-2 px-1 rounded transition-colors uppercase whitespace-nowrap flex items-center justify-center gap-1 cursor-pointer"
+        {% endif %}
+      >
+        Order Now <i class="fa-solid fa-chevron-right text-[9px]"></i>
+      </button>
+    </form>
   </div>
+
 </div>

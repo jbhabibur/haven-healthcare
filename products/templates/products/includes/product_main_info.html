@@ -1,7 +1,7 @@
 {% csrf_token %}
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start" 
-     x-data="{ 
+      x-data="{ 
         qty: 1, 
         maxStock: parseInt('{{ product.stock_quantity }}') || 0,
         mainImage: '{% if product.primary_image %}{{ product.primary_image.url }}{% else %}{% endif %}',
@@ -192,9 +192,18 @@
         Add to Cart
       </button>
 
-      <button type="button" {% if product.stock_quantity == 0 %}disabled class="bg-[var(--color-text-muted)] opacity-50 text-white px-8 py-3 rounded-xl font-bold text-sm tracking-wide cursor-not-allowed"{% else %}class="bg-[var(--color-accent)] hover:opacity-90 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md tracking-wide cursor-pointer"{% endif %}>
-        Order Now
-      </button>
+      <form action="{% url 'payments:stripe-checkout' %}" method="POST" class="m-0 inline-block">
+        {% csrf_token %}
+        <button type="submit" 
+            {% if product.stock_quantity == 0 %}
+                disabled 
+                class="bg-[var(--color-text-muted)] opacity-50 text-white px-8 py-3 rounded-xl font-bold text-sm tracking-wide cursor-not-allowed flex items-center justify-center gap-1.5"
+            {% else %}
+                class="bg-[var(--color-accent)] hover:opacity-90 text-white px-8 py-3 rounded-xl font-bold text-sm tracking-wide shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
+            {% endif %}>
+            Order Now <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </button>
+      </form>
     </div>
 
   </div>

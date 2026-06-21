@@ -21,6 +21,7 @@
         {% if cart_items %}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             
+            <!-- Cart Items List -->
             <div class="lg:col-span-2 space-y-4">
                 {% for item in cart_items %}
                 <div class="group relative grid grid-cols-1 sm:grid-cols-12 items-center p-5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 gap-4">
@@ -79,6 +80,7 @@
                 </div>
             </div>
 
+            <!-- Order Summary Panel with Integrated Stripe Payment -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2 border-b border-gray-100 pb-3">
                     <i class="fa-solid fa-receipt text-gray-400"></i> Order Summary
@@ -104,9 +106,13 @@
                     </div>
                 </div>
 
-                <a href="#" class="block w-full bg-accent hover:bg-accent/90 text-white text-center py-3.5 rounded-xl font-bold text-sm tracking-wide shadow-md transition-all duration-200">
-                    Proceed to Secure Checkout <i class="fa-solid fa-chevron-right ml-1 text-xs"></i>
-                </a>
+                <!-- Stripe Checkout Trigger Form (POST Method) -->
+                <form action="{% url 'payments:stripe-checkout' %}" method="POST" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-accent hover:bg-accent/90 text-white text-center py-3.5 rounded-xl font-bold text-sm tracking-wide shadow-md transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer">
+                        Proceed to Secure Checkout <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </form>
                 
                 <div class="mt-5 pt-4 border-t border-gray-50 flex items-center justify-center gap-3 text-[11px] font-medium text-gray-400">
                     <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> Secure Gateway</span>
@@ -117,6 +123,7 @@
 
         </div>
         {% else %}
+        <!-- Empty Cart State -->
         <div class="text-center py-16 bg-white border border-gray-100 rounded-3xl shadow-sm max-w-md mx-auto my-6 px-6">
             <div class="w-24 h-24 bg-slate-50 text-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-5">
                 <i class="fa-solid fa-basket-shopping text-4xl"></i>
