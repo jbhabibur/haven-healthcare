@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
-from django.db.models import Avg
+from django.db.models import Avg, Q
 from django.http import JsonResponse
 import json
 from .models import MedicineCategory, MedicineProduct, MedicineReview
 
-# Category-wise Medicine Product List View
+# Category-wise & Search-enabled Medicine Product List View
 class CategoryProductListView(ListView):
     model = MedicineProduct
     template_name = 'products/collection.html' 
@@ -15,21 +15,38 @@ class CategoryProductListView(ListView):
     def get_queryset(self):
         slug = self.kwargs['category_slug']
         
-        # Base queryset with optimizations
+        # Base queryset with database optimizations
         queryset = MedicineProduct.objects.filter(is_available=True).select_related('manufacturer', 'generic_name')
         
+        # 1. Filter by Category setup
         if slug == 'shop':
             # Create a mock/fake category object for the template
             self.category = {'name': 'All Medicines', 'slug': 'shop'}
-            return queryset
         else:
             # Fetch the actual category from DB
             self.category = get_object_or_404(MedicineCategory, slug=slug, is_active=True)
-            return queryset.filter(category=self.category)
+            queryset = queryset.filter(category=self.category)
+
+        # 2. Extract and evaluate search keywords safely from request URL parameters
+        search_query = self.request.GET.get('q')
+        if search_query:
+            search_query = search_query.strip()
+            # Perform multi-field lookup across related foreign tables using OR logic gates
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |                         # Brand name
+                Q(generic_name__name__icontains=search_query) |           # Chemical formulation name
+                Q(manufacturer__name__icontains=search_query) |           # Manufacturing company name
+                Q(strength__icontains=search_query)                       # Dosage metrics (e.g., 500mg)
+            ).distinct()                                                  # Eliminate row duplicates caused by structural joins
+            
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = self.category
+        
+        # Pass current search query string back to template engine to hold state inside navigation layout text boxes
+        context['search_query'] = self.request.GET.get('q', '').strip()
         
         # Calculate top-rated medicines dynamically using your MedicineReview model
         context['top_rated_products'] = MedicineProduct.objects.filter(is_available=True) \

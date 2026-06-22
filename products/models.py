@@ -200,5 +200,4 @@ class MedicineReview(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        # Fixed syntax here (Added trailing parenthesis and closing string)
         return f"{self.rating} Star Review by {self.name} for {self.medicine.name}"

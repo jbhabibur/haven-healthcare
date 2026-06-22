@@ -161,26 +161,29 @@
   </ul>
 
   <div class="flex items-center space-x-6">
-    <div
+    <form 
+      action="{% url 'products:category_products' 'shop' %}" 
+      method="get" 
       class="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden h-10 focus-within:border-accent transition-all"
     >
       <div
         class="bg-accent text-white px-4 flex items-center justify-center h-full cursor-pointer hover:opacity-90 transition-opacity"
       >
-        <a href="{% url 'appointments:doctor_list' %}" class="text-sm font-bold uppercase tracking-wideK">Doctor</a>
+        <a href="{% url 'appointments:doctor_list' %}" class="text-sm font-bold uppercase tracking-wide">Doctor</a>
       </div>
       <div class="flex items-center px-2 bg-white w-36">
         <input
           type="text"
+          name="q"
+          value="{{ search_query|default:'' }}"
           placeholder="Search products..."
           class="w-full outline-none text-sm text-primary placeholder-gray-400 py-1"
         />
-        <button class="text-gray-400 hover:text-primary ml-2 transition-colors">
+        <button type="submit" class="text-gray-400 hover:text-primary ml-2 transition-colors">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </div>
-    </div>
-
+    </form>
     <div class="relative group cursor-pointer w-fit" 
          x-data="{ cartCount: 0 }"
          x-init="
