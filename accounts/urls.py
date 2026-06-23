@@ -6,7 +6,8 @@ from .views import (
     MyPasswordResetView,
     MyPasswordResetDoneView,
     MyPasswordResetConfirmView,
-    MyPasswordResetCompleteView
+    MyPasswordResetCompleteView,
+    activate_account
 )
 
 from . import views
@@ -18,6 +19,9 @@ urlpatterns = [
     path('signup/', SignUpView.as_view(), name='signup'),
     path('login/', MyLoginView.as_view(), name='login'),
     path('logout/', MyLogoutView.as_view(), name='logout'),
+    
+    # --- Email Verification Activation ---
+    path('accounts/activate/<str:uidb64>/<str:token>/', activate_account, name='activate_account'),
 
     # --- Password Reset Flow ---
     path('password-reset/', MyPasswordResetView.as_view(), name='password_reset'),

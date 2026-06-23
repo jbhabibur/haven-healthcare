@@ -1,36 +1,58 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.core.exceptions import ValidationError
 from .models import User, DoctorProfile, PatientProfile
 
-# ১. কাস্টম ইউজার ক্রিয়েশন ফর্ম (রেজিস্ট্রেশনের জন্য)
+
+# --- Custom User Creation Form (For Registration) ---
 class CustomUserCreationForm(UserCreationForm):
+    # Explicitly enforce email as a required field
+    email = forms.EmailField(required=True, help_text="Required. A valid email address.")
+
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ('username', 'email', 'role', 'first_name', 'last_name')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # এখানে আপনি চাইলে স্টাইলিংয়ের জন্য Tailwind বা Bootstrap ক্লাস যোগ করতে পারেন
+        # Dynamically inject basic styling classes into all rendered form fields
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'border rounded p-2 w-full'})
 
-# ২. কাস্টম ইউজার এডিট ফর্ম (প্রোফাইল আপডেটের জন্য)
+    def clean_email(self):
+        """
+        Validates that the provided email address is unique across the platform.
+        Performs a case-insensitive lookup to block duplicate account creation.
+        """
+        email = self.cleaned_data.get('email')
+        if email:
+            # Check if any user profile already claims this specific email address
+            if User.objects.filter(email__iexact=email).exists():
+                raise ValidationError("A user with this email address already exists.")
+        
+        return email
+
+
+# --- Custom User Change Form (For Base Account Updates) ---
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'role')
 
-# ৩. ডাক্তার প্রোফাইল ফর্ম
+
+# --- Doctor Profile Form ---
 class DoctorProfileForm(forms.ModelForm):
     class Meta:
         model = DoctorProfile
-        exclude = ('user',) # ইউজার ফিল্ডটি ইউজার নিজে এডিট করবে না, তাই বাদ দেওয়া হয়েছে
+        # The user link mapping field is excluded to prevent changing ownership profiles manually
+        exclude = ('user',) 
         widgets = {
             'specialization': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Ex: Cardiology'}),
             'qualification': forms.Textarea(attrs={'rows': 3}),
         }
 
-# ৪. পেশেন্ট প্রোফাইল ফর্ম
+
+# --- Patient Profile Form ---
 class PatientProfileForm(forms.ModelForm):
     class Meta:
         model = PatientProfile

@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block content %}
+<div style="max-width: 600px; margin: 50px auto; text-align: center; padding: 30px; border: 1px solid #e3e3e3; border-radius: 8px; background-color: #f9f9f9;">
+    <h2 style="color: #28a745;">Account Activated Successfully!</h2>
+    <p style="font-size: 16px; color: #555; margin-top: 15px;">
+        Thank you, <strong>{{ user.username }}</strong>. Your email has been successfully verified, and your account is now active.
+    </p>
+    <div style="margin-top: 25px;">
+        <a href="{% url 'accounts:login' %}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Proceed to Login
+        </a>
+    </div>
+</div>
+{% endblock %}

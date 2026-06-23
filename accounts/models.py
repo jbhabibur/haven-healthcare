@@ -6,8 +6,6 @@ from django.db.models import Avg
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from cloudinary.models import CloudinaryField
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 # --- Custom User Model ---
@@ -60,9 +58,9 @@ class DoctorProfile(models.Model):
         blank=True, 
         null=True, 
         help_text=(
-            "এডমিন নির্দেশিকা: ডক্টরের মূল পরিচিতি, চিকিৎসাপ্রাপ্ত রোগের তালিকা এবং নিচের "
-            "স্লোগানটি ইমেজের বা প্রেসক্রিপশনের মতো হুবহু এন্টার (New Line) দিয়ে দিয়ে এখানে পেস্ট করুন। "
-            "কোনോ প্রকার HTML ট্যাগ ব্যবহারের প্রয়োজন নেই, ফ্রন্টএন্ডে এটি স্বয়ংক্রিয়ভাবে সাজিয়ে নিবে।"
+            "Admin Guideline: Paste the doctor's main introduction, treated disease list, and slogan "
+            "exactly as it appears on their prescription or image using the Enter key (New Line). "
+            "No HTML tags are required; the frontend will format it automatically."
         )
     )
     

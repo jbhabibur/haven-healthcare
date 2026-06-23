@@ -14,9 +14,19 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
+from django.contrib import messages
+
+# Imports required for decoding email activation tokens
+from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth.tokens import default_token_generator
+
 from .forms import CustomUserCreationForm
 from .models import PatientProfile, DoctorProfile
-from django.contrib import messages
+
+User = get_user_model()
+
 
 # --- Authentication & Registration ---
 
@@ -30,18 +40,32 @@ class SignUpView(CreateView):
 
     def form_valid(self, form):
         # Saved instance triggers post_save signals for profile creation
-        user = form.save()
+        user = form.save(commit=False)
+        user.is_active = False  
+        user.save()
         return super().form_valid(form)
 
 
 class MyLoginView(LoginView):
     """
-    Handles user login authentication.
+    Handles user login authentication and ensures unverified users are blocked.
     """
     template_name = 'accounts/registration/login.html'
 
+    def form_invalid(self, form):
+        username = form.cleaned_data.get('username')
+        if username:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            try:
+                user = User.objects.get(username=username)
+                if not user.is_active:
+                    messages.error(self.request, "Your account is not activated yet. Please check your email for the verification link.")
+            except User.DoesNotExist:
+                pass
+        return super().form_invalid(form)
+
     def get_success_url(self):
-        # Redirect directly to home page or custom dashboard after a successful login
         return reverse_lazy('home')
 
 
@@ -50,6 +74,32 @@ class MyLogoutView(LogoutView):
     Handles user logout session destruction.
     """
     next_page = reverse_lazy('accounts:login')
+
+
+# --- Email Verification Activation ---
+
+def activate_account(request, uidb64, token):
+    """
+    Decodes the user ID from base64 and validates the unique email token.
+    If valid, activates the user account so they can log in.
+    """
+    try:
+        # Decode user primary key from base64 string
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    # Verify if the user exists and the token matches/has not expired
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        
+        # Render success message layout
+        return render(request, 'accounts/registration/activation_success.html', {'user': user})
+    else:
+        # Render fallback structure if the verification link is faulty or expired
+        return render(request, 'accounts/registration/activation_invalid.html')
 
 
 # --- Password Reset Flow ---
