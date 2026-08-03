@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y libpq-dev curl \
 COPY --from=builder /install /usr/local
 
 # Copy all project files
-COPY . .clea
+COPY . .
 
 # Create a non-root user (Crucial for production security)
 RUN useradd -m havenuser && chown -R havenuser /app
