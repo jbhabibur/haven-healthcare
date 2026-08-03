@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-y*thsz%xeb$pb0@i5-8j5fu@w3wm*a38!imon5rqf&((2(cx32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')]
 
 # Site configuration
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000') # Default to localhost for development; override in production environment variables
