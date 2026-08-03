@@ -15,7 +15,15 @@ SECRET_KEY = 'django-insecure-y*thsz%xeb$pb0@i5-8j5fu@w3wm*a38!imon5rqf&((2(cx32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')]
+ALLOWED_HOSTS = [
+    "haven-healthcare-5.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://haven-healthcare-5.onrender.com",
+]
 
 # Site configuration
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000') # Default to localhost for development; override in production environment variables
@@ -79,11 +87,10 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE_NAME'),
         'USER': os.environ.get('DATABASE_USER'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-        'HOST': os.environ.get('DATABASE_HOST'),
-        'PORT': os.environ.get('DATABASE_PORT'),
+        'HOST': os.environ.get('DATABASE_HOST', 'db'),
+        'PORT': os.environ.get('DATABASE_PORT', '5432'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
