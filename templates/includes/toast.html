@@ -1,0 +1,100 @@
+{% comment %} <div
+    x-data="{
+        show: false,
+        message: '',
+        type: 'success',
+        timeout: null,
+
+        showToast(msg, msgType) {
+            this.message = msg;
+            // Django এর 'error' ট্যাগ কে 'error' টাইপে ম্যাপ করা
+            this.type = msgType === 'error' ? 'error' : 'success';
+            this.show = true;
+
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(() => { this.show = false; }, 3000);
+        },
+
+        init() {
+            // Django মেসেজ থাকলে পেজ লোড হওয়ার সাথে সাথে দেখাবে
+            {% for message in messages %}
+                this.showToast('{{ message|escapejs }}', '{{ message.tags|escapejs }}');
+            {% endfor %}
+        }
+    }"
+    x-show="show"
+    x-transition
+    class="fixed top-5 right-5 z-[9999]"
+    style="display:none;"
+>
+    <div
+        class="rounded-xl px-5 py-3 text-white shadow-xl flex items-center gap-2"
+        :class="{
+            'bg-green-600': type === 'success',
+            'bg-red-600': type === 'error',
+            'bg-blue-600': type === 'info',
+            'bg-yellow-500 text-black': type === 'warning'
+        }"
+    >
+        <span x-text="message"></span>
+        <!-- ক্লোজ বাটন (ঐচ্ছিক) -->
+        <button @click="show = false" class="ml-2 hover:opacity-75">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div> {% endcomment %}
+
+
+<div
+    x-data="{
+        show: false,
+        message: '',
+        type: 'success',
+        timeout: null,
+
+        showToast(msg, msgType) {
+            this.message = msg;
+            // Django এর ট্যাগগুলো ম্যাপ করা
+            if (msgType.includes('error')) this.type = 'error';
+            else if (msgType.includes('warning')) this.type = 'warning';
+            else if (msgType.includes('info')) this.type = 'info';
+            else this.type = 'success';
+            
+            this.show = true;
+            
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(() => { this.show = false; }, 4000);
+        }
+    }"
+    x-init="
+        {% for message in messages %}
+            setTimeout(() => { 
+                showToast('{{ message|escapejs }}', '{{ message.tags|escapejs }}'); 
+            }, {{ forloop.counter0 }} * 500);
+        {% endfor %}
+    "
+    x-show="show"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 translate-y-2"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 translate-y-2"
+    class="fixed top-5 right-5 z-[9999]"
+    style="display:none;"
+>
+    <div
+        class="rounded-xl px-5 py-3 text-white shadow-xl flex items-center gap-2"
+        :class="{
+            'bg-green-600': type === 'success',
+            'bg-red-600': type === 'error',
+            'bg-blue-600': type === 'info',
+            'bg-yellow-500 text-black': type === 'warning'
+        }"
+    >
+        <span x-text="message"></span>
+        <button @click="show = false" class="ml-2 hover:opacity-75">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>

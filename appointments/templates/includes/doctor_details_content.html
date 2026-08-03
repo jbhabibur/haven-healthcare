@@ -5,7 +5,7 @@
             
             <div x-show="activeTab === 'info'" x-transition:enter="transition ease-out duration-200" class="space-y-6">
                 <p class="text-[15px] text-gray-800 leading-relaxed font-normal whitespace-pre-line">
-                    {{ doctor.doctor_info|default:"ডাঃ নূর আলম, রাজশাহী মেডিকেল বিশ্ববিদ্যালয়ের মেডিসিন অনুষদ থেকে ন্যাচারাল মেডিসিনের উপর বাংলাদেশের সর্বোচ্চ ডিগ্রী (BUMS - Bachelor of Unani Medicine & Surgery) অর্জন করেছেন এবং ইসলামী বিশ্ববিদ্যালয়, কুষ্টিয়াতে Food & Nutrition এর উপর স্নাতকোত্তর এ অধ্যয়নরত। বর্তমানে রেনিক্স ইউনানী ল্যাবরেটরিজ লিমিটেড এ মেডিকেল অফিসার হিসেবে কর্মরত আছেন। রেনিক্স চিকিৎসা কেন্দ্রে পুরুষ ও মহিলাদের হরমোনজনিত সমস্যা, অ্যালার্জি, চর্মরোগ, যৌন সমস্যা এবং যেকোনো ধরনের ব্যথা বিষয়ে নিয়মিত রোগী দেখছেন।" }}
+                    {{ doctor.doctor_info|default:"ডাক্তারের তথ্য পাওয়া যায়নি।" }}
                 </p>
                 
                 <div class="space-y-3">
@@ -21,23 +21,7 @@
                         {% else %}
                             <li class="flex items-start gap-2">
                                 <span class="text-gray-400 mt-1 text-[10px]">■</span>
-                                <span>পাইলস / অর্শ রোগ</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
-                                <span>প্রস্রাবে সমস্যা - জ্বালা-পোড়া, ঘন ঘন প্রস্রাব, ইনফেকশন</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
-                                <span>হজমজনিত সমস্যা ও কোষ্ঠকাঠিন্য</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
-                                <span>লিভারের সমস্যা</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-gray-400 mt-1 text-[10px]">■</span>
-                                <span>পেটের পীড়া, জ্বালা-পোড়া, আলসার</span>
+                                <span>বিশেষজ্ঞতার তথ্য পাওয়া যায়নি।</span>
                             </li>
                         {% endif %}
                     </ul>
@@ -46,18 +30,26 @@
 
             <div x-show="activeTab === 'experience'" x-transition:enter="transition ease-out duration-200" style="display: none;">
                 <p class="text-sm text-gray-600">
-                    {% with latest_exp=doctor.experiences.first %}
-                        Working as a <span class="font-semibold">{{ latest_exp.designation|default:"Medical Officer" }}</span> 
-                        at <span class="font-semibold">{{ latest_exp.institution_name|default:"Renix Unani Laboratories Ltd." }}</span> 
-                        with {{ doctor.total_experience_years|default:"2+ Years" }} of experience.
-                    {% endwith %}
+                    {% if doctor.experiences.first %}
+                        {% with latest_exp=doctor.experiences.first %}
+                            Working as a <span class="font-semibold">{{ latest_exp.designation|default:"Medical Officer" }}</span> 
+                            at <span class="font-semibold">{{ latest_exp.institution_name|default:"Hospital/Clinic" }}</span> 
+                            with {{ doctor.total_experience_years|default:"0" }} years of experience.
+                        {% endwith %}
+                    {% else %}
+                        অভিজ্ঞতার তথ্য পাওয়া যায়নি।
+                    {% endif %}
                 </p>
             </div>
 
             <div x-show="activeTab === 'reviews'" x-transition:enter="transition ease-out duration-200" style="display: none;">
                 <p class="text-sm text-gray-600">
-                    Total Rating: <span class="font-bold text-gray-800">{{ doctor.average_rating|default:"4.80" }}</span> 
-                    out of {{ doctor.total_reviews_count|default:"10" }} reviews.
+                    {% if doctor.average_rating %}
+                        Total Rating: <span class="font-bold text-gray-800">{{ doctor.average_rating }}</span> 
+                        out of {{ doctor.total_reviews_count|default:"0" }} reviews.
+                    {% else %}
+                        রেটিংয়ের তথ্য পাওয়া যায়নি।
+                    {% endif %}
                 </p>
             </div>
 
@@ -78,7 +70,7 @@
                                 Active Slot: {{ first_slot.date|date:"D" }} ({{ first_slot.start_time|time:"h:i A" }} - {{ first_slot.end_time|time:"h:i A" }})
                             {% endwith %}
                         {% else %}
-                            Sat - Fri (09:00 AM - 09:00 PM)
+                            তথ্য পাওয়া যায়নি।
                         {% endif %}
                     </div>
                 </div>
@@ -87,28 +79,32 @@
                     <div>
                         <span class="block text-[11px] text-gray-400 font-medium">Consultation Fee</span>
                         <span class="text-sm font-bold text-gray-800 mt-0.5 block">
-                            ৳ {{ doctor.consultation_fee|floatformat:0 }} <span class="text-xs text-gray-400 font-normal">(inc. VAT)</span>
+                            {% if doctor.consultation_fee %}
+                                ৳ {{ doctor.consultation_fee|floatformat:0 }} <span class="text-xs text-gray-400 font-normal">(inc. VAT)</span>
+                            {% else %}
+                                —
+                            {% endif %}
                         </span>
                     </div>
                     
                     <div>
                         <span class="block text-[11px] text-gray-400 font-medium">Follow-Up Fee</span>
                         <span class="text-sm font-bold text-gray-800 mt-0.5 block">
-                            ৳ {{ doctor.follow_up_fee|floatformat:0 }} 
-                            <span class="text-[11px] text-gray-400 font-normal">(incl. VAT) 
-                                <span class="text-gray-500 font-medium">(Within {{ doctor.follow_up_validity_days|default:"14" }} days)</span>
-                            </span>
+                            {% if doctor.follow_up_fee %}
+                                ৳ {{ doctor.follow_up_fee|floatformat:0 }} 
+                                <span class="text-[11px] text-gray-400 font-normal">(incl. VAT) 
+                                    <span class="text-gray-500 font-medium">(Within {{ doctor.follow_up_validity_days|default:"14" }} days)</span>
+                                </span>
+                            {% else %}
+                                —
+                            {% endif %}
                         </span>
                     </div>
                     
                     <div>
                         <span class="block text-[11px] text-gray-400 font-medium">Joined Renix Care</span>
                         <span class="text-sm font-bold text-gray-800 mt-0.5 block">
-                            {% if doctor.user.date_joined %}
-                                {{ doctor.user.date_joined|date:"F d, Y" }}
-                            {% else %}
-                                August 12, 2012
-                            {% endif %}
+                            {{ doctor.user.date_joined|date:"F d, Y"|default:"তথ্য পাওয়া যায়নি" }}
                         </span>
                     </div>
                     

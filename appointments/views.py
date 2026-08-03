@@ -1,47 +1,65 @@
 # appointments/views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
+
+from datetime import datetime, timedelta
+import json
+
+# Django Core & Shortcut Imports
 from django.contrib import messages
-from .models import DoctorSlot, Appointment
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+
+# Django Database & Functions
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
+
+# Django Generic Class-Based Views
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
+
+# Local App Models & Profiles
 from accounts.models import DoctorProfile, PatientProfile
+from .models import Appointment, DoctorSlot
 
 
-
-#  DOCTOR SLOT VIEWS
-class DoctorSlotListView(LoginRequiredMixin, ListView):
-    """Allows doctors to view all of their created time slots"""
-    model = DoctorSlot
-    template_name = 'appointments/slot_list.html'
-    context_object_name = 'slots'
+# Public & Profile Views
+class DoctorPublicListView(ListView):
+    model = DoctorProfile
+    template_name = 'appointments/doctor_list.html'
+    context_object_name = 'doctors'
 
     def get_queryset(self):
-        # Filters slots exclusively for the currently logged-in doctor
-        doctor_profile = get_object_or_404(DoctorProfile, user=self.request.user)
-        return DoctorSlot.objects.filter(doctor=doctor_profile).order_by('date', 'start_time')
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('search', '').strip()
+        
+        if search_query:
+            queryset = queryset.annotate(
+                full_name=Concat('user__first_name', Value(' '), 'user__last_name')
+            ).filter(
+                Q(full_name__icontains=search_query) | 
+                Q(user__first_name__icontains=search_query) | 
+                Q(user__last_name__icontains=search_query) |
+                Q(specialization__icontains=search_query)
+            )
+        return queryset
+
+class DoctorDetailView(DetailView):
+    model = DoctorProfile
+    template_name = 'appointments/doctor_detail.html'
+    context_object_name = 'doctor'
+
+    def get_object(self, queryset=None):
+        username = self.kwargs.get('username')
+        return get_object_or_404(DoctorProfile, user__username=username)
 
 
-class DoctorSlotCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    """Allows doctors to create new available time slots"""
-    model = DoctorSlot
-    template_name = 'appointments/slot_form.html'
-    fields = ['date', 'start_time', 'end_time']
-    success_url = reverse_lazy('slot_list')
-
-    def test_func(self):
-        # Verifies if the authenticated user is actually a doctor
-        return self.request.user.is_doctor
-
-    def form_valid(self, form):
-        # Automatically assigns the logged-in doctor's profile on successful form submission
-        form.instance.doctor = get_object_or_404(DoctorProfile, user=self.request.user)
-        return super().form_valid(form)
 
 
-#  APPOINTMENT VIEWS
+# Appointment Management
 class AppointmentListView(LoginRequiredMixin, ListView):
-    """Displays a list of appointments based on the authenticated user's role"""
     model = Appointment
     template_name = 'appointments/appointment_list.html'
     context_object_name = 'appointments'
@@ -54,80 +72,160 @@ class AppointmentListView(LoginRequiredMixin, ListView):
             return Appointment.objects.filter(patient__user=user).order_by('-created_at')
         return Appointment.objects.none()
 
-
 class AppointmentDetailView(LoginRequiredMixin, DetailView):
-    """Displays the detailed view of a specific appointment"""
     model = Appointment
     template_name = 'appointments/appointment_detail.html'
     context_object_name = 'appointment'
 
-
 class BookAppointmentView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    """Allows authenticated patients to request or book an appointment with a doctor"""
     model = Appointment
     template_name = 'appointments/book_appointment.html'
-    # 'doctor' and 'slot' fields are handled via URL query parameters and hidden inputs
-    fields = ['preferred_date', 'preferred_time_notes', 'symptoms']
+    fields = ['notes', 'symptoms']
     success_url = reverse_lazy('appointments:appointment_list')
 
-    # Essential to allow custom handling via handle_no_permission instead of instant 403 response
-    raise_exception = True 
-
     def test_func(self):
-        # Checks if the user is authenticated and possesses a patient role
-        return self.request.user.is_authenticated and getattr(self.request.user, 'is_patient', False)
-
-    def handle_no_permission(self):
-        """Redirects unauthenticated users to login with a warning toast message instead of showing 403 Forbidden"""
-        if not self.request.user.is_authenticated:
-            # Adds a warning toast notification message for guest users
-            messages.warning(self.request, "Please log in to your account first to book an online appointment.")
-            return redirect('accounts:login') 
-        
-        # Adds an error toast if user is logged in but does not hold a patient role
-        messages.error(self.request, "Only patient accounts are authorized to book appointment requests.")
-        return redirect('appointments:doctor_list')
+        return self.request.user.is_authenticated and hasattr(self.request.user, 'patient_profile')
 
     def form_valid(self, form):
         doctor_id = self.request.POST.get('doctor')
+        slot_id = self.request.POST.get('slot')
+        patient_phone = self.request.POST.get('patient_phone')
 
-        print("POST DATA =", self.request.POST)
-        print("DOCTOR ID =", doctor_id)
+        # Update patient phone number
+        patient_profile = self.request.user.patient_profile
+        if patient_phone:
+            patient_profile.phone_number = patient_phone
+            patient_profile.save()
 
-        form.instance.doctor = get_object_or_404(
-            DoctorProfile,
-            id=doctor_id
-        )
-
-        form.instance.patient = get_object_or_404(
-            PatientProfile,
-            user=self.request.user
-        )
-
-        form.instance.status = 'PENDING'
-
+        appointment = form.save(commit=False)
+        appointment.patient = patient_profile
+        appointment.doctor = get_object_or_404(DoctorProfile, user__username=doctor_id)
+        
+        # slot_id is checked to ensure it's not None or 'custom' before proceeding
+        if slot_id and slot_id != 'custom':
+            slot = get_object_or_404(DoctorSlot, id=slot_id, is_booked=False)
+            appointment.slot = slot
+            appointment.status = 'CONFIRMED'
+            slot.is_booked = True
+            slot.save()
+        
+        appointment.save()
         return super().form_valid(form)
-
+    
     def get_context_data(self, **kwargs):
-        # Passes the selected doctor data to the template to build an informative booking summary UI
         context = super().get_context_data(**kwargs)
-        doctor_id = self.request.GET.get('doctor')
-        if doctor_id:
-            context['selected_doctor'] = get_object_or_404(DoctorProfile, id=doctor_id)
+        # Get the doctor's username from the GET parameters
+        doctor_username = self.request.GET.get('doctor')
+        
+        if doctor_username:
+            User = get_user_model()
+            doctor_user = User.objects.filter(username=doctor_username).first()
+            # Pass the doctor's name to the context
+            context['doctor_name'] = str(doctor_user) if doctor_user else "Unknown Doctor"
+        else:
+            context['doctor_name'] = "Unknown Doctor"
+            
         return context
 
 
 
-#  PUBLIC LIST/DETAIL VIEWS
-class DoctorPublicListView(ListView):
-    """Displays a public list of all available doctors"""
-    model = DoctorProfile
-    template_name = 'appointments/doctor_list.html'
-    context_object_name = 'doctors'
+
+# Doctor Slots
+class DoctorSlotListView(LoginRequiredMixin, ListView):
+    model = DoctorSlot
+    template_name = 'appointments/slot_list.html'
+    context_object_name = 'slots'
+
+    def get_queryset(self):
+        # Filters slots exclusively for the currently logged-in doctor
+        doctor_profile = get_object_or_404(DoctorProfile, user=self.request.user)
+        return DoctorSlot.objects.filter(doctor=doctor_profile).order_by('date', 'start_time')
+
+@login_required
+def create_slots(request):
+    if request.method == 'POST':
+        try:
+            start_date_str = request.POST.get('start_date')
+            weeks = int(request.POST.get('weeks', 1))
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            
+            doctor = DoctorProfile.objects.get(user=request.user)
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            slots_created = 0
+
+            for i in range(weeks):
+                slot_date = start_date + timedelta(weeks=i)
+                obj, created = DoctorSlot.objects.get_or_create(
+                    doctor=doctor, date=slot_date, start_time=start_time, end_time=end_time
+                )
+                if created:
+                    slots_created += 1
+
+            if slots_created > 0:
+                msg = f"{slots_created} new slots created!"
+                msg_type = "success"
+                messages.success(request, msg)
+            else:
+                msg = "No new slots created (they already exist)."
+                msg_type = "warning"
+                messages.warning(request, msg)
+            
+            response = redirect('accounts:doctor_profile')
+            # HTMX Trigger
+            response['HX-Trigger'] = json.dumps({"toast": {"message": msg, "type": msg_type}})
+            return response
+
+        except Exception as e:
+            msg = f"Error: {str(e)}"
+            messages.error(request, msg)
+            response = redirect('accounts:doctor_profile')
+            response['HX-Trigger'] = json.dumps({"toast": {"message": msg, "type": "error"}})
+            return response
+    return redirect('accounts:doctor_profile')
 
 
-class DoctorDetailView(DetailView):
-    """Displays the profile and detailed specifications of a specific doctor"""
-    model = DoctorProfile
-    template_name = 'appointments/doctor_detail.html'
-    context_object_name = 'doctor'
+
+
+@login_required
+def delete_slot(request, slot_id):
+    slot = get_object_or_404(DoctorSlot, id=slot_id, doctor=request.user.doctor_profile)
+    
+    if not slot.is_booked:
+        slot.delete()
+        msg = "Slot deleted successfully!"
+        msg_type = "success"
+        messages.success(request, msg)
+    else:
+        msg = "Cannot delete a booked slot!"
+        msg_type = "error"
+        messages.error(request, msg)
+    
+    response = redirect('accounts:doctor_profile')
+    # HTMX Trigger
+    response['HX-Trigger'] = json.dumps({"toast": {"message": msg, "type": msg_type}})
+    return response
+
+def check_slots(request):
+    doctor_username = request.GET.get('doctor')
+    if not doctor_username:
+        return JsonResponse({'slots': []})
+
+    today = timezone.now().date()
+    print("First check,", doctor_username)
+
+    all_slots_of_doctor = DoctorSlot.objects.filter(
+        doctor__user__username=doctor_username
+    )
+    print("object", DoctorSlot.objects)
+
+    slots_list = list(DoctorSlot.objects.values())
+    print("list", slots_list)
+
+    context = {
+        'slots_list': slots_list,
+    }
+
+    print("meme", slots_list)
+
+    return render(request, 'includes/slots_partial.html', context)

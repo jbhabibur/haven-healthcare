@@ -218,7 +218,7 @@
       <button
         @click="userOpen = !userOpen"
         @click.away="userOpen = false"
-        class="w-8 h-8 aspect-square flex-shrink-0 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm border border-white ring-1 ring-gray-100 uppercase leading-none"
+        class="w-8 h-8 aspect-square flex-shrink-0 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm border border-white ring-1 ring-gray-100 uppercase leading-none cursor-pointer"
       >
         {{ user.username.0 }}
       </button>
@@ -253,7 +253,7 @@
           {% csrf_token %}
           <button
             type="submit"
-            class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+            class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
           >
             <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout
           </button>

@@ -1,0 +1,27 @@
+<div id="slot-section">
+    <label class="block text-sm font-medium text-text-main mb-3">Select a Time Slot</label>
+    <div class="space-y-3 max-h-60 overflow-y-auto pr-2">
+        {% for slot in slots_list %}
+            <label class="p-3 border border-border rounded-xl bg-surface flex justify-between items-center cursor-pointer hover:border-primary transition-all">
+                <div class="flex items-center gap-3">
+                    {% if not slot.is_booked %}
+                        <input type="radio" name="slot" value="{{ slot.id }}" required class="accent-primary">
+                    {% else %}
+                        <input type="radio" disabled class="opacity-50">
+                    {% endif %}
+                    <div>
+                        <p class="text-xs font-bold text-text-main">{{ slot.date }}</p>
+                        <p class="text-xs text-text-muted">{{ slot.start_time }} - {{ slot.end_time }}</p>
+                    </div>
+                </div>
+                {% if slot.is_booked %}
+                    <span class="text-red-500 text-xs font-medium italic">Booked</span>
+                {% else %}
+                    <span class="text-green-500 text-xs font-medium">Available</span>
+                {% endif %}
+            </label>
+        {% empty %}
+            <p class="text-xs text-text-muted italic text-center">No slots found.</p>
+        {% endfor %}
+    </div>
+</div>

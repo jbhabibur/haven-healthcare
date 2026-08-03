@@ -9,19 +9,19 @@
     <title>{% block title %} Haven Healthcare Center {% endblock title %}</title>
 
     <link rel="icon" type="image/x-icon" href="{% static 'images/logo.png' %}">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
     <link rel="stylesheet" href="{% static 'dist/output.css' %}" />
 
     <script src="https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2.2.1/dist/redux-toolkit.umd.js"></script>
-
-    <script src="{% static 'js/cartStore.js' %}?v=1.0.2"></script>
-
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script type="module" src="{% static 'js/cartStore.js' %}?v=1.0.2"></script>
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  </head>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+
+    <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+</head>
   
   <body class="flex flex-col min-h-screen font-sans text-slate-900 bg-white">
     
@@ -35,6 +35,10 @@
     </main>
 
     {% include "includes/footer.html" %}
+
+    {% include "includes/toast.html" %}
+
+    {% include "includes/demo_credentials.html" %}
     
   </body>
 </html>

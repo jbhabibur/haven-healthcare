@@ -47,14 +47,14 @@ _Detailed practitioner overview highlighting medical credentials, scheduling ava
 
 ## 🛠️ Technical Stack & Ecosystem
 
-| Layer                       | Technology                  | Operational Utilization                                                                    |
-| :-------------------------- | :-------------------------- | :----------------------------------------------------------------------------------------- |
-| **Backend Framework**       | Django 5.x / Python 3.11+   | Secure MVC structure, Object-Relational Mapping (ORM), Form and ModelForm API enforcement. |
-| **Database Engine**         | PostgreSQL                  | Relational transactional safety, relational integrity, and strict scaling configurations.  |
-| **Frontend Architecture**   | Tailwind CSS v4, Alpine.js  | Minimalist, ultra-responsive editorial interfaces, utility-first performance optimization. |
-| **Global State Management** | Redux Architecture          | Global client-side interface state synchronization across dynamic UI widgets.              |
-| **Container Execution**     | Docker & Docker Compose     | Multi-container microservice isolation, standard environment synchronization.              |
-| **Payment Gateway**         | SSLCommerz / Stripe Sandbox | PCI-DSS compliant secure financial settlement endpoints.                                   |
+| Layer                       | Technology                 | Operational Utilization                                                                    |
+| :-------------------------- | :------------------------- | :----------------------------------------------------------------------------------------- |
+| **Backend Framework**       | Django 5.x / Python 3.11+  | Secure MVC structure, Object-Relational Mapping (ORM), Form and ModelForm API enforcement. |
+| **Database Engine**         | PostgreSQL                 | Relational transactional safety, relational integrity, and strict scaling configurations.  |
+| **Frontend Architecture**   | Tailwind CSS v4, Alpine.js | Minimalist, ultra-responsive editorial interfaces, utility-first performance optimization. |
+| **Global State Management** | Redux Architecture         | Global client-side interface state synchronization across dynamic UI widgets.              |
+| **Container Execution**     | Docker & Docker Compose    | Multi-container microservice isolation, standard environment synchronization.              |
+| **Payment Gateway**         | Stripe Sandbox             | PCI-DSS compliant secure financial settlement endpoints.                                   |
 
 ---
 
@@ -115,16 +115,38 @@ cd haven-healthcare
 
 #### 2. Setup Secret Environments
 
-Create a `.env` file in the root project directory and input appropriate testing variables:
+Create a `.env` file in the root directory of the project. You can copy the template below and replace the placeholder values with your local configuration and third-party API credentials:
 
 ```env
+# Django Core Settings
+
 DEBUG=True
-SECRET_KEY=django-insecure-your-production-safe-key-here
-DB_NAME=haven_db
-DB_USER=haven_admin
-DB_PASSWORD=haven_secure_pass
-DB_HOST=db
-DB_PORT=5432
+SECRET_KEY=django-insecure-your-custom-development-key-here
+ALLOWED_HOSTS=127.0.0.1,localhost,backend
+
+# PostgreSQL Database Configuration
+POSTGRES_DB=haven_db
+POSTGRES_USER=your_database_user
+POSTGRES_PASSWORD=your_database_password
+DATABASE_HOST=db
+DATABASE_PORT=5432
+
+# Email Configuration (e.g., Gmail SMTP)
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_google_app_password
+
+# Cloudinary Storage Configuration
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Stripe Payment Gateway Configuration
+STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 ```
 
 ## 3. Build and Start Container Services

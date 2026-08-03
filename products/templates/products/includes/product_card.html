@@ -9,7 +9,7 @@
                 quantity: this.qty
             };
 
-            // 1. Collect Django CSRF Token from the DOM
+            // Collect Django CSRF Token from the DOM
             let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
             if (!csrfToken) {
                 csrfToken = document.cookie
@@ -23,7 +23,7 @@
                 return;
             }
 
-            // 2. Sending request to the correct namespaced URL 'products:add_to_cart'
+            // Sending request to the correct namespaced URL 'products:add_to_cart'
             fetch('{% url 'products:add_to_cart' %}', {
                 method: 'POST',
                 headers: {

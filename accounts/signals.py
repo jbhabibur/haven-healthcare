@@ -1,13 +1,19 @@
+# accounts/signals.py
+
+# Django Core Imports
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
-from .models import User, DoctorProfile, PatientProfile
+
 
 # Imports required for generating secure email verification tokens and links
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
+
+# Local models import
+from .models import User, DoctorProfile, PatientProfile
 
 
 @receiver(post_save, sender=User)
@@ -30,7 +36,7 @@ def handle_user_registration_signals(sender, instance, created, **kwargs):
             uid = urlsafe_base64_encode(force_bytes(instance.pk))
             
             # Reconstruct URL endpoint structure mapping to your verification path
-            verification_url = f"http://127.0.0.1:8000/accounts/activate/{uid}/{token}/"
+            verification_url = f"{settings.SITE_URL}/accounts/activate/{uid}/{token}/"
             
             subject = "Activate Your Haven Healthcare Account"
             message = (

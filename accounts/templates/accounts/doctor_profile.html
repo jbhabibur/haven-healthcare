@@ -3,91 +3,87 @@
 {% block title %}Doctor Profile Dashboard{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ openEditModal: false }">
+<div class="max-w-7xl mx-auto px-6 py-8">
+    {% comment %} Patient Profile Section {% endcomment %}
+    <div
+        id="profile-section"
+        x-data="{
+            open: false,
+            openEditModal: false
+        }"
+        x-init="
+            const params = new URLSearchParams(window.location.search);
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="mb-4 p-4 rounded-lg bg-success/10 text-success border border-success/20 shadow-sm flex justify-between items-center">
-                <span class="text-sm font-medium">{{ message }}</span>
-            </div>
-        {% endfor %}
-    {% endif %}
+            if (params.has('profile')) {
+                open = true;
 
-    <!-- Main Profile Card -->
-    <div class="bg-surface-muted shadow-soft rounded-xl border border-border p-6 mb-8">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-border mb-6 gap-4">
-            <div class="flex items-center gap-4">
-                <!-- Compact Square Profile Picture -->
-                <div class="h-16 w-16 rounded-lg bg-surface border border-border flex-shrink-0 overflow-hidden flex items-center justify-center">
-                    {% if doctor_profile.image %}
-                        <img src="{{ doctor_profile.image.url }}" alt="Doctor Profile" class="h-full w-full object-cover">
-                    {% else %}
-                        <svg class="h-10 w-10 text-text-muted/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    {% endif %}
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-text-main">{{ doctor_profile }}</h3>
-                    <p class="text-sm font-semibold text-secondary">{{ doctor_profile.specialization|default:"Specialization Not Set" }}</p>
-                    <p class="text-xs text-text-muted mt-0.5">Reg No: {{ doctor_profile.registration_number|default:"N/A" }}</p>
-                </div>
-            </div>
-            
-            <!-- Edit Button using Secondary/Primary Brand Theme -->
-            <button @click="openEditModal = true" type="button" class="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition shadow-sm gap-2 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                Edit Profile Info
-            </button>
-        </div>
+                $nextTick(() => {
+                    document.getElementById('profile-section').scrollIntoView({
+                        behavior: 'instant',
+                        block: 'start'
+                    });
+                });
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="p-4 bg-surface rounded-lg border border-border/60">
-                <span class="text-xs font-semibold uppercase text-text-muted block mb-1">Consultation Fee</span>
-                <span class="text-lg font-bold text-text-main">৳{{ doctor_profile.consultation_fee }}</span>
-            </div>
-            <div class="p-4 bg-surface rounded-lg border border-border/60">
-                <span class="text-xs font-semibold uppercase text-text-muted block mb-1">Follow-up Fee</span>
-                <span class="text-lg font-bold text-text-main">৳{{ doctor_profile.follow_up_fee }}</span>
-                <span class="text-xs text-text-muted/80 block mt-0.5">Valid for {{ doctor_profile.follow_up_validity_days }} days</span>
-            </div>
-            <div class="p-4 bg-surface rounded-lg border border-border/60">
-                <span class="text-xs font-semibold uppercase text-text-muted block mb-1">Experience</span>
-                <span class="text-lg font-bold text-text-main">{{ doctor_profile.total_experience_years }} Years</span>
-            </div>
-            <div class="p-4 bg-surface rounded-lg border border-border/60">
-                <span class="text-xs font-semibold uppercase text-text-muted block mb-1">Availability Status</span>
-                {% if doctor_profile.is_available %}
-                    <span class="inline-flex mt-1 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">Available</span>
-                {% else %}
-                    <span class="inline-flex mt-1 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error/10 text-error">Unavailable</span>
-                {% endif %}
+                history.replaceState({}, '', window.location.pathname);
+            }
+        "
+        class="my-6 rounded-2xl bg-surface-muted border border-border shadow-soft transition-all duration-300 hover:shadow-lg hover:border-primary/20"
+    >
+    
+        <button @click="open = !open" 
+                class="w-full flex justify-between items-center px-8 py-6 text-left transition-all duration-300 hover:bg-surface cursor-pointer">
+            <span class="text-lg font-bold text-text-main tracking-tight">Doctor Profile</span>
+            <span class="text-xl text-text-muted transition-transform duration-500 block" :class="open ? 'rotate-180' : ''">
+                <span x-text="open ? '-' : '+'"></span>
+            </span>
+        </button>
+        
+        <div x-show="open" x-collapse.duration.500ms class="border-t border-border">
+            <div class="p-8">
+                {% include 'accounts/includes/_doctor_profile_content.html' %}
             </div>
         </div>
 
-        <!-- Qualifications -->
-        {% if doctor_profile.qualification %}
-        <div class="mt-6 pt-4 border-t border-border">
-            <h4 class="text-xs font-semibold uppercase text-text-muted mb-1">Qualifications</h4>
-            <p class="text-sm text-text-main/90">{{ doctor_profile.qualification }}</p>
-        </div>
-        {% endif %}
-
-        <!-- Intro Details -->
-        {% if doctor_profile.doctor_info %}
-        <div class="mt-6 pt-4 border-t border-border">
-            <h4 class="text-xs font-semibold uppercase text-text-muted mb-1">Intro & Services</h4>
-            <p class="text-sm text-text-main/90 whitespace-pre-line leading-relaxed">{{ doctor_profile.doctor_info }}</p>
-        </div>
-        {% endif %}
     </div>
 
-    {% include 'accounts/includes/_edit_profile_modal.html' %}
+    {% comment %} Doctor Slots Section {% endcomment %}
+    <div
+        id="slots-section"
+        x-data="{
+            open: true
+        }"
+        x-init="
+            const params = new URLSearchParams(window.location.search);
 
-    {% include 'accounts/includes/_patient_records_table.html' %}
+            if (params.has('slots')) {
+                open = true;
+
+                $nextTick(() => {
+                    document.getElementById('slots-section').scrollIntoView({
+                        behavior: 'instant',
+                        block: 'start'
+                    });
+                });
+
+                history.replaceState({}, '', window.location.pathname);
+            }
+        "
+        class="bg-surface-muted overflow-hidden my-6 rounded-2xl border border-border shadow-soft transition-all duration-300"
+    >
+        <button @click="open = !open" 
+                class="w-full flex justify-between items-center px-8 py-6 text-left transition-colors duration-200 hover:bg-surface cursor-pointer">
+            <span class="text-lg font-bold text-text-main tracking-tight">Manage Slots</span>
+            <span class="text-xl text-text-muted transition-transform duration-500 block" :class="open ? 'rotate-180' : ''">
+                <span x-text="open ? '-' : '+'"></span>
+            </span>
+        </button>
+        
+        <div x-show="open" x-collapse class="border-t border-border">
+            <div class="px-8 pb-8 pt-6">
+                {% include 'accounts/includes/_doctor_slots_content.html' %}
+            </div>
+        </div>
+    </div>
 
 </div>
 {% endblock %}

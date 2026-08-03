@@ -1,21 +1,7 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ doctor.user.get_full_name }} - Profile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        body {
-            font-family: 'Inter', 'Hind Siliguri', sans-serif;
-            background-color: #f7fafc;
-        }
-    </style>
-</head>
-<body class="p-4 md:p-8">
+{% block content %}
+<main class="bg-gray-50 px-4 py-8">
+    {% comment %} Display any messages (e.g., warnings, errors) {% endcomment %}
+    {% include 'includes/messages.html' %}
 
     <div class="max-w-6xl mx-auto">
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 md:p-6">
@@ -36,12 +22,12 @@
                         {{ doctor.user.get_full_name|default:doctor.user.username }}
                     </h2>
                     <p class="text-sm text-gray-500 font-medium mb-2.5">
-                        {{ doctor.degrees|default:"BUMS (Rajshahi Medical University)" }}
+                        {{ doctor.qualification|default:"No information found" }}
                     </p>
                     
                     <div class="mb-3">
                         <span class="bg-[#689f38] text-white text-xs font-medium px-2 py-1 rounded">
-                            {{ doctor.designation|default:"General Physician (Natural Medicine)" }}
+                            {{ doctor.specialization|default:"No information found" }}
                         </span>
                     </div>
                     
@@ -50,36 +36,42 @@
                             Specialty
                         </span>
                         <p class="text-sm text-gray-700 font-normal leading-relaxed mt-1.5">
-                            {{ doctor.specialty_description|default:"পাইলস ও কোষ্ঠকাঠিন্য, যৌন ও চর্মরোগ, প্রস্রাব সংক্রান্ত সংক্রমণ, মাসিক সমস্যা, হজমের সমস্যা, সাধারণ দুর্বলতা এবং অন্যান্য সাধারণ স্বাস্থ্য সমস্যার বিশেষজ্ঞ।" }}
+                            {{ doctor.specialty_description|default:"No information found" }}
                         </p>
                     </div>
 
                     <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-8 gap-y-2 pt-1 border-t border-gray-50">
                         <div>
                             <span class="block text-[11px] text-gray-400 font-medium uppercase tracking-wider">Total Experience</span>
-                            <span class="text-sm font-bold text-gray-800">{{ doctor.experience_years|default:"2+" }} Years</span>
+                            <span class="text-sm font-bold text-gray-800">{{ doctor.total_experience_years|default:"No information found" }}</span>
                         </div>
                         <div>
                             <span class="block text-[11px] text-gray-400 font-medium uppercase tracking-wider">Reg. Number</span>
-                            <span class="text-sm font-bold text-gray-800">{{ doctor.registration_number|default:"U-543" }}</span>
+                            <span class="text-sm font-bold text-gray-800">{{ doctor.registration_number|default:"No information found" }}</span>
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <span class="block text-[11px] text-gray-400 font-medium uppercase tracking-wider">Total Rating</span>
                             <span class="text-sm font-bold text-gray-800 flex items-center gap-1">
                                 <i class="fa-solid fa-star text-amber-400 text-xs"></i> 
-                                {{ doctor.rating|default:"4.80" }} 
-                                <span class="text-gray-400 font-normal text-xs">({{ doctor.total_reviews|default:"10" }})</span>
+                                {{ doctor.average_rating|default:"0.00" }} 
+                                <span class="text-gray-400 font-normal text-xs">({{ doctor.total_reviews_count|default:"0" }})</span>
                             </span>
                         </div>
                     </div>
 
                     <div class="mt-4 text-sm text-gray-500">
-                        Working in <span class="font-semibold text-gray-800">{{ doctor.current_workplace|default:"Renix Unani Laboratories Ltd." }}</span>
+                        Working in 
+                        <span class="font-semibold text-gray-800">
+                            {% if doctor.experiences.all %}
+                                {{ doctor.experiences.first.institution_name }}
+                            {% else %}
+                                No information found
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
 
                 <div class="w-full md:w-[260px] flex flex-col justify-between items-center md:items-end flex-shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
-                    
                     <div class="w-full text-center md:text-right relative mb-4 md:mb-0">
                         <button class="absolute -top-2 right-0 md:relative md:top-0 md:right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Share">
                             <i class="fa-solid fa-share-nodes text-base"></i>
@@ -92,26 +84,16 @@
                     </div>
 
                     <div class="w-full space-y-2">
-                        <div class="grid grid-cols-2 gap-2">
-                            <button class="bg-[#4fd1c5] hover:bg-[#3bc0b4] text-white text-sm font-medium py-2 px-3 rounded-md flex items-center justify-center gap-1.5 transition-colors">
-                                <i class="fa-solid fa-video text-xs"></i> Video Call
-                            </button>
-                            <button class="bg-[#68d391] hover:bg-[#52c27d] text-white text-sm font-medium py-2 px-3 rounded-md flex items-center justify-center gap-1.5 transition-colors">
-                                <i class="fa-solid fa-microphone text-xs"></i> Voice Call
-                            </button>
-                        </div>
-                        
-                        <a href="{% url 'appointments:book_appointment' %}?doctor={{ doctor.id }}" 
-                           class="w-full bg-[#2b6cb0] hover:bg-[#23578e] text-white text-sm font-semibold py-2.5 px-4 rounded-md flex items-center justify-center gap-2 transition-colors evaluation-link text-center">
-                            <i class="fa-regular fa-calendar-check"></i> Book Online Appointment
+
+                        <a href="{% url 'appointments:book_appointment' %}?doctor={{ doctor.user.username }}" 
+                            class="w-full bg-[#2b6cb0] hover:bg-[#23578e] text-white text-sm font-semibold py-2.5 px-4 rounded-md flex items-center justify-center gap-2 transition-colors text-center cursor-pointer">
+                            <i class="fa-regular fa-calendar-check"></i>Book Online Appointment
                         </a>
                     </div>
-
                 </div>
 
             </div>
         </div>
     </div>
-
-</body>
-</html>
+</main>
+{% endblock content %}

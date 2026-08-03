@@ -1,0 +1,145 @@
+<div class="w-full">
+    <div class="flex flex-col gap-8">
+        
+        <!-- উপরে: Doctor Profile Details -->
+        <div class="w-full">
+            <div class="w-full px-4 md:px-6 p-6 bg-surface-muted rounded-3xl border border-border shadow-soft" x-data="{ open: false }">
+                
+                <form method="POST" action="{% url 'accounts:update_doctor_profile' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="flex flex-col md:flex-row gap-6 items-start mb-6">
+                        <div class="h-32 w-32 rounded-2xl bg-surface border border-border flex-shrink-0 flex items-center justify-center text-text-muted relative group overflow-hidden">
+                            {% if doctor.image %}
+                                <img src="{{ doctor.image.url }}" alt="{{ doctor.user.first_name }}" class="h-full w-full object-cover rounded-2xl">
+                                <button type="button" onclick="document.getElementById('remove_image_input').value='true'; this.form.submit();" 
+                                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow-sm z-10">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                                <input type="hidden" name="remove_image" id="remove_image_input" value="false">
+                            {% else %}
+                                <img src="/static/images/default-doctor.png" alt="Default" class="h-full w-full object-cover">
+                            {% endif %}
+
+                            <label for="image_upload" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </label>
+                            <input type="file" name="image" id="image_upload" class="hidden" onchange="this.form.submit()">
+                        </div>
+
+                        <div class="flex-grow w-full">
+
+                            <div class="flex justify-between items-start">
+                                {% comment %} Name {% endcomment %}
+                                <div>
+                                    <h2 class="text-3xl font-bold text-text-main">Dr. {{ doctor.user }}</h2>
+                                
+                                </div>
+                                <div>
+                                    <h2 class="text-3xl font-bold text-text-main">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h2>
+                                    <p class="text-primary font-semibold text-lg">{{ doctor.specialization }}</p>
+                                </div>
+
+                                {% comment %} Edit profile {% endcomment %}
+                                {% if request.user == doctor.user or request.user.is_staff %}
+                                <button type="button" @click="openEditModal = true" class="px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg z-20 relative cursor-pointer">
+                                    Edit Profile
+                                </button>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-3 mt-4 text-sm">
+                                <span class="bg-blue-50 text-primary px-4 py-1.5 rounded-full font-medium border border-blue-100">Reg: {{ doctor.registration_number }}</span>
+                                <span class="bg-emerald-50 text-success px-4 py-1.5 rounded-full font-medium border border-emerald-100">Fee: ৳{{ doctor.consultation_fee }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="grid md:grid-cols-2 gap-8 border-t border-border pt-6">
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-widest text-text-muted font-bold mb-1.5">Qualification</label>
+                            <p class="text-text-main font-medium">{{ doctor.qualification }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-widest text-text-muted font-bold mb-1.5">Follow-up Policy</label>
+                            <p class="text-text-main font-medium">৳{{ doctor.follow_up_fee }} <span class="text-text-muted font-normal">(Valid for {{ doctor.follow_up_validity_days }} days)</span></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-widest text-text-muted font-bold mb-1.5">Specialty Description</label>
+                        <p class="text-text-muted leading-relaxed">{{ doctor.specialty_description }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 bg-surface rounded-2xl border border-border">
+                    <h3 class="font-bold text-text-main mb-3">About Doctor</h3>
+                    <div class="relative">
+                        <div :class="open ? 'h-auto' : 'h-24 overflow-hidden'" class="transition-all duration-300">
+                            <p class="text-text-muted leading-relaxed whitespace-pre-line">{{ doctor.doctor_info }}</p>
+                        </div>
+                        <button type="button" @click="open = !open" class="mt-3 text-secondary text-sm font-bold hover:underline flex items-center cursor-pointer">
+                            <span x-text="open ? 'Read Less' : 'Read More'"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- নিচে: Professional Experience -->
+        <div class="w-full">
+            <div class="w-full px-4 md:px-6 p-6 bg-surface-muted rounded-3xl border border-border shadow-soft" x-data="{ showExpForm: false }">
+                <div class="pb-6 mb-8 border-b border-border flex justify-between items-center">
+                    <h3 class="font-bold text-text-main text-2xl">Professional Experience</h3>
+                    <button type="button" @click="showExpForm = !showExpForm" class="text-sm bg-primary text-white px-4 py-2 rounded-lg font-bold cursor-pointer">
+                        <span x-text="showExpForm ? 'Cancel' : '+ Add Experience'"></span>
+                    </button>
+                </div>
+                
+                <div x-show="showExpForm" x-cloak class="mb-6 p-4 bg-surface border border-border rounded-xl">
+                    <form method="POST" action="{% url 'accounts:add_experience' %}">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" name="designation" placeholder="Designation" required class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" name="institution_name" placeholder="Institution" required class="w-full px-3 py-2 border rounded-lg">
+                            <input type="date" name="start_date" required class="w-full px-3 py-2 border rounded-lg">
+                            <input type="date" name="end_date" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <button type="submit" class="mt-4 w-full bg-primary text-white py-2 rounded-lg font-bold">Save Experience</button>
+                    </form>
+                </div>
+
+                <div class="space-y-8">
+                    {% for experience in doctor.experiences.all %}
+                    <div class="relative pl-8 group">
+                        <div class="absolute left-[15px] top-2 bottom-[-40px] w-0.5 bg-border group-last:hidden"></div>
+                        <div class="bg-surface-muted p-5 rounded-xl border border-border shadow-soft transition-all duration-300 hover:border-primary/30 flex justify-between items-start">
+                            <div>
+                                <h4 class="text-xl font-bold text-text-main">{{ experience.designation }}</h4>
+                                <p class="text-secondary font-semibold text-lg mt-0.5">{{ experience.institution_name }}</p>
+                                <div class="flex flex-wrap items-center gap-3 mt-4">
+                                    <p class="text-sm text-text-muted font-medium bg-surface px-3 py-1.5 rounded-lg border border-border">
+                                        {{ experience.start_date|date:"M Y" }} - 
+                                        {% if experience.end_date %}{{ experience.end_date|date:"M Y" }}{% else %}<span class="text-success font-bold">Present</span>{% endif %}
+                                    </p>
+                                    <span class="text-xs bg-primary/5 text-primary px-3 py-1.5 rounded-lg font-bold border border-primary/10">
+                                        {{ experience.duration_text }}
+                                    </span>
+                                </div>
+                            </div>
+                            <a href="{% url 'accounts:delete_experience' experience.id %}" onclick="return confirm('Are you sure?')" class="text-red-500 font-bold hover:underline">Delete</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                        <p class="text-text-muted italic bg-surface p-6 rounded-xl text-center border border-dashed border-border">
+                            No experience added yet.
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

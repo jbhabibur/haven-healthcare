@@ -1,0 +1,253 @@
+<div x-data="doctorProfile({ 
+    initialExperiences: {{ experiences|safe }} 
+})" class="p-6 space-y-10">
+
+    <!-- Image and Header Section -->
+    <div class="flex items-center gap-6 border-b pb-8">
+        <div class="h-24 w-24 rounded-2xl bg-gray-100 border flex-shrink-0 relative group overflow-hidden">
+            <template x-if="doctor.image">
+                <img
+                    :src="doctor.image.url"
+                    class="h-full w-full object-cover"
+                >
+            </template>
+
+            <template x-if="!doctor.image">
+                <div class="h-full w-full flex items-center justify-center text-gray-400">
+                    No Img
+                </div>
+            </template>
+
+            <button
+                x-show="doctor.image"
+                type="button"
+                @click="removeImage()"
+                class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition shadow-sm z-10">
+
+                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <label
+                for="image_upload"
+                class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
+
+                <svg class="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                </svg>
+            </label>
+
+            <input
+                type="file"
+                id="image_upload"
+                class="hidden"
+                @change="uploadImage($event)">
+        </div>
+        <div>
+            <h2 class="text-2xl font-bold">{{ doctor.user.first_name }} {{ doctor.user.last_name }}</h2>
+            <p class="text-blue-600 font-semibold">Doctor Profile</p>
+        </div>
+    </div>
+
+    <div>
+        <h2 class="text-xl font-bold mb-4 ml-2">Doctor User</h2>
+        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <table class="w-full text-left">
+                <tbody class="divide-y divide-gray-100">
+                    <template x-for="field in fields" :key="field.name">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 text-gray-600 font-medium w-1/3" x-text="field.label"></td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    <input :type="field.type" x-model="field.value" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                                    <button @click="save(field)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">💾</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <h2 class="text-xl font-bold mb-4 ml-2">Doctor Basic Info</h2>
+        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <table class="w-full text-left">
+                <tbody class="divide-y divide-gray-100">
+                    <template x-for="field in basicInfo" :key="field.name">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 text-gray-600 font-medium w-1/3" x-text="field.label"></td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    <input :type="field.type" x-model="field.value" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" />
+                                    <button @click="save(field)" class="p-2 text-green-600 hover:bg-green-50 rounded-lg">💾</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-10">
+        <h2 class="text-xl font-bold mb-4 ml-2">Work Experiences</h2>
+        <div class="space-y-4 mb-6">
+            <template x-for="exp in experiences" :key="exp.id">
+                <div class="flex justify-between items-center p-4 bg-white border rounded-lg">
+                    <div>
+                        <h3 class="font-bold" x-text="exp.institution_name"></h3>
+                        <p class="text-sm text-gray-500" x-text="exp.designation"></p>
+                        <p class="text-xs text-blue-600 font-semibold mt-1" x-text="'Duration: ' + exp.duration"></p>
+                    </div>
+                    <button @click="deleteExperience(exp.id)" class="text-red-500 hover:text-red-700">Delete</button>
+                </div>
+            </template>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+            <input x-model="newExp.institution_name" placeholder="Institution Name" class="p-2 border rounded">
+            <input x-model="newExp.designation" placeholder="Designation" class="p-2 border rounded">
+            <input x-model="newExp.department" placeholder="Department (Optional)" class="p-2 border rounded">
+            <input type="date" x-model="newExp.start_date" class="p-2 border rounded">
+            <input type="date" x-model="newExp.end_date" class="p-2 border rounded">
+            <div class="md:col-span-2">
+                <button @click="addExperience()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Add Experience
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('doctorProfile', (config) => ({
+        doctor: {
+        image: {% if doctor.image %}{ url: "{{ doctor.image.url }}" }{% else %}null{% endif %}
+        },
+        experiences: config ? config.initialExperiences : [],
+        fields: [
+            { label: 'Username', name: 'username', value: '{{ doctor.user.username }}', type: 'text' },
+            { label: 'First Name', name: 'first_name', value: '{{ doctor.user.first_name }}', type: 'text' },
+            { label: 'Last Name', name: 'last_name', value: '{{ doctor.user.last_name }}', type: 'text' },
+            { label: 'Email', name: 'email', value: '{{ doctor.user.email }}', type: 'email' },
+            { label: 'Password', name: 'password', value: '', type: 'password' }
+        ],
+        basicInfo: [
+            { label: 'Specialization', name: 'specialization', value: '{{ doctor.specialization }}', type: 'text' },
+            { label: 'Qualification', name: 'qualification', value: '{{ doctor.qualification }}', type: 'text' },
+            { label: 'Registration No', name: 'registration_number', value: '{{ doctor.registration_number }}', type: 'text' },
+            { label: 'Consultation Fee', name: 'fee', value: '{{ doctor.consultation_fee }}', type: 'number' },
+            { label: 'Follow up Fee', name: 'follow_up_fee', value: '{{ doctor.follow_up_fee }}', type: 'number' },
+            { label: 'Validity (Days)', name: 'follow_up_validity', value: '{{ doctor.follow_up_validity_days }}', type: 'number' }
+        ],
+        newExp: { institution_name: '', designation: '', start_date: '', end_date: '' },
+
+        // Image Upload Function
+        async uploadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const res = await fetch("{% url 'accounts:update_doctor_image' %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                
+                this.doctor.image = { url: data.image_url + '?t=' + Date.now() };
+            } else {
+                alert('Failed to update image.');
+            }
+        },
+
+        // Remove Image Function
+        async removeImage() {
+            if (!confirm('Are you sure you want to remove the profile image?')) return;
+
+            const formData = new FormData();
+            formData.append('remove_image', 'true');
+
+            const res = await fetch("{% url 'accounts:update_doctor_image' %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                // Set image to null so UI updates immediately
+                this.doctor.image = null; 
+            } else {
+                alert('Failed to remove image.');
+            }
+        },
+
+        async save(field) {
+            const payload = { [field.name]: field.value };
+            const res = await fetch("{% url 'accounts:update_doctor_profile' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) alert('Updated!');
+        },
+        async addExperience() {
+            const res = await fetch("{% url 'accounts:add_experience' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify(this.newExp)
+            });
+            const data = await res.json();
+            if (res.ok && data.status === "success") {
+                console.log("New Experience Received:", data.experience);
+                this.experiences.unshift(data.experience); // নতুন এক্সপেরিয়েন্স লিস্টের উপরে যোগ হবে
+                this.newExp = {
+                    institution_name: '',
+                    designation: '',
+                    department: '',
+                    start_date: '',
+                    end_date: ''
+                };
+            } else {
+                alert('Failed to add experience.');
+            }
+        },
+
+        async deleteExperience(id) {
+            if (!confirm('Are you sure you want to delete this experience?')) return;
+            
+            const res = await fetch(`/accounts/delete-experience/${id}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            });
+            
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                // UI থেকে ইনস্ট্যান্ট রিমুভ করার জন্য ফিল্টার করা হলো (কোনো রিফ্রেশ ছাড়াই মুছে যাবে)
+                this.experiences = this.experiences.filter(exp => exp.id !== id);
+            } else {
+                alert('Failed to delete experience.');
+            }
+        }
+    }));
+});
+</script>

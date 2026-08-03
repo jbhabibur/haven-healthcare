@@ -1,3 +1,5 @@
+# accounts/models.py
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
@@ -8,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 from cloudinary.models import CloudinaryField
 
 
-# --- Custom User Model ---
+# Custom User Model
 class User(AbstractUser):
     class Role(models.TextChoices):
         ADMIN = "ADMIN", "Admin"
@@ -33,12 +35,13 @@ class User(AbstractUser):
         return self.username
 
 
-# --- Doctor Profile ---
+# Doctor Profile Model  
 class DoctorProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
-        related_name='doctor_profile'
+        related_name='doctor_profile',
+        unique=True
     )
 
     image = CloudinaryField(
@@ -71,7 +74,7 @@ class DoctorProfile(models.Model):
 
     is_available = models.BooleanField(default=True)
     
-    # --- Admin Approval Fields for Doctors ---
+    # Admin Approval Fields for Doctors
     is_approved = models.BooleanField(default=False, help_text="Designates whether this doctor is approved by admin.")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -107,7 +110,7 @@ class DoctorProfile(models.Model):
         return self.reviews.count()
 
 
-# --- Doctor Experience ---
+# Doctor Experience Model
 class DoctorExperience(models.Model):
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='experiences')
     institution_name = models.CharField(max_length=255) 
@@ -124,24 +127,30 @@ class DoctorExperience(models.Model):
 
     @property
     def duration_text(self):
-        """
-        Helper property to automatically format experience duration as 'X years Y months Z days'
-        """
+        # start_date and end_date are required to calculate duration; if not present, return "N/A"
+        if not self.start_date:
+            return "N/A"
+            
         end = self.end_date if self.end_date else date.today()
-        delta = relativedelta(end, self.start_date)
-        
+
+        # Calculate the difference in years, months, and days using relativedelta
+        try:
+            delta = relativedelta(end, self.start_date)
+        except TypeError:
+            return "N/A"
+            
         parts = []
         if delta.years > 0:
-            parts.append(f"{delta.years} years")
+            parts.append(f"{delta.years} {'year' if delta.years == 1 else 'years'}")
         if delta.months > 0:
-            parts.append(f"{delta.months} months")
+            parts.append(f"{delta.months} {'month' if delta.months == 1 else 'months'}")
         if delta.days > 0:
-            parts.append(f"{delta.days} days")
-            
+            parts.append(f"{delta.days} {'day' if delta.days == 1 else 'days'}")
+                
         return ", ".join(parts) if parts else "0 days"
 
 
-# --- Doctor Review & Rating System ---
+# Doctor Review & Rating System Model
 class DoctorReview(models.Model):
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='submitted_reviews') 
@@ -157,7 +166,7 @@ class DoctorReview(models.Model):
         return f"Review ({self.rating}★) for {self.doctor} by {self.user}"
 
 
-# --- Patient Profile ---
+# Patient Profile Model
 class PatientProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='patient_profile')
 
@@ -176,9 +185,18 @@ class PatientProfile(models.Model):
 
     age = models.PositiveIntegerField(null=True, blank=True)
     blood_group = models.CharField(max_length=5, blank=True)
-    medical_history = models.TextField(blank=True)
+
+    address = models.TextField(blank=True, null=True, help_text="Enter patient's full address")
+
+    image = CloudinaryField(
+        'image', 
+        folder='patients',
+        blank=True, 
+        null=True,
+        help_text="Upload patient's profile picture to Cloudinary (Optional)"
+    )
     
-    # --- Admin Approval Fields for Patients ---
+    # Admin Approval Fields for Patients
     is_approved = models.BooleanField(default=False, help_text="Designates whether this patient is approved by admin.")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -186,3 +204,23 @@ class PatientProfile(models.Model):
         if self.user.first_name or self.user.last_name:
             return f"{self.user.first_name} {self.user.last_name}".strip()
         return self.user.username
+
+
+# Medical Record Model 
+class MedicalRecord(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name='medical_records')
+    doctor = models.ForeignKey('accounts.DoctorProfile', on_delete=models.SET_NULL, null=True, related_name='recorded_histories')
+    
+    diagnosis = models.CharField(max_length=255)
+    symptoms = models.TextField(blank=True, null=True)
+    treatment_notes = models.TextField()
+    prescribed_medication = models.JSONField(blank=True, null=True, help_text="JSON format: {'meds': ['Napa', 'Seclo']}")
+    
+    date_recorded = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date_recorded']
+
+    def __str__(self):
+        return f"{self.patient.user.first_name} - {self.diagnosis}"

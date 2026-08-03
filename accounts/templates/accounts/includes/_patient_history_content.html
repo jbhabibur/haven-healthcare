@@ -1,0 +1,60 @@
+<div class="space-y-6">
+    <div class="grid gap-4">
+        {% for record in medical_records %}
+        <div class="group relative flex gap-4 p-5 rounded-2xl border border-border bg-surface-muted shadow-soft hover:shadow-lg transition-all duration-300">
+            <div class="flex-shrink-0">
+                <div class="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                    <i class="fa-solid fa-notes-medical text-lg"></i>
+                </div>
+            </div>
+            
+            <div class="flex-grow space-y-2">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-text-main text-base">{{ record.diagnosis }}</h4>
+                        <p class="text-xs text-text-muted">Dr. {{ record.doctor.user.get_full_name|default:"General Physician" }}</p>
+                    </div>
+                    <span class="text-[11px] font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">
+                        {{ record.date_recorded|date:"d M, Y" }}
+                    </span>
+                </div>
+                
+                <div class="bg-surface p-3 rounded-lg border border-border">
+                    <p class="text-xs text-text-main leading-relaxed">"{{ record.treatment_notes }}"</p>
+                </div>
+
+                {% if record.prescribed_medication %}
+                <div class="pt-2 flex flex-wrap gap-2">
+                    {% for med in record.prescribed_medication.meds %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-secondary/10 text-secondary border border-secondary/20">
+                        {{ med }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-16 border-2 border-dashed border-border rounded-2xl">
+            <i class="fa-solid fa-folder-open text-4xl text-text-muted/50 mb-3"></i>
+            <p class="text-sm text-text-muted">No medical history available yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if medical_records.has_other_pages %}
+    <div class="flex items-center justify-center pt-4">
+        <nav class="flex items-center gap-1">
+            {% if medical_records.has_previous %}
+            <a href="?history_page={{ medical_records.previous_page_number }}" class="p-2 text-text-muted hover:text-primary"><i class="fa-solid fa-chevron-left"></i></a>
+            {% endif %}
+            
+            <span class="px-4 py-1.5 text-sm bg-primary text-white rounded-lg font-bold">{{ medical_records.number }}</span>
+            
+            {% if medical_records.has_next %}
+            <a href="?history_page={{ medical_records.next_page_number }}" class="p-2 text-text-muted hover:text-primary"><i class="fa-solid fa-chevron-right"></i></a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>

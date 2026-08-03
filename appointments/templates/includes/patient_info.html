@@ -1,0 +1,27 @@
+{% if request.user.is_authenticated %}
+    <div class="bg-primary/5 p-4 rounded-xl border border-primary/10 mb-2 space-y-3">
+        <p class="text-sm text-primary font-medium">
+            Booking as: <span class="font-bold text-text-main" x-text="patientName"></span>
+        </p>
+
+        <div class="space-y-2">
+            <label class="text-xs text-text-muted font-medium block">Phone Number:</label>
+            <div class="flex items-center gap-2">
+                <input type="tel" 
+                       name="patient_phone" 
+                       x-model="patientPhone" 
+                       x-init="$nextTick(() => { patientPhone = '{{ request.user.patient_profile.phone_number|default:"" }}' })"
+                       :readonly="!isEditingPhone"
+                       class="text-sm font-semibold text-text-main px-3 py-2 rounded-xl border outline-none transition-all w-full"
+                       :class="isEditingPhone ? 'bg-white border-primary ring-2 ring-primary/20' : 'bg-surface border-transparent'">
+                
+                <button type="button" 
+                        @click="togglePhoneEdit()" 
+                        class="text-xs font-medium px-3 py-2 rounded-xl border transition-all cursor-pointer"
+                        :class="isEditingPhone ? 'bg-secondary text-white border-secondary' : 'bg-transparent text-text-main border-border'">
+                    <span x-text="isEditingPhone ? 'Save' : 'Update'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endif %}

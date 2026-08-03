@@ -18,7 +18,7 @@ class CategoryProductListView(ListView):
         # Base queryset with database optimizations
         queryset = MedicineProduct.objects.filter(is_available=True).select_related('manufacturer', 'generic_name')
         
-        # 1. Filter by Category setup
+        # Filter by Category setup
         if slug == 'shop':
             # Create a mock/fake category object for the template
             self.category = {'name': 'All Medicines', 'slug': 'shop'}
@@ -27,7 +27,7 @@ class CategoryProductListView(ListView):
             self.category = get_object_or_404(MedicineCategory, slug=slug, is_active=True)
             queryset = queryset.filter(category=self.category)
 
-        # 2. Extract and evaluate search keywords safely from request URL parameters
+        # Extract and evaluate search keywords safely from request URL parameters
         search_query = self.request.GET.get('q')
         if search_query:
             search_query = search_query.strip()

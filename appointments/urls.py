@@ -1,20 +1,33 @@
 # appointments/urls.py
+
 from django.urls import path
-from . import views
+from .views import (
+    DoctorPublicListView,
+    DoctorDetailView,
+    AppointmentListView,
+    AppointmentDetailView, 
+    BookAppointmentView,
+    DoctorSlotListView,
+    create_slots,
+    delete_slot,
+    check_slots,
+)
 
 app_name = 'appointments'
 
 urlpatterns = [
-    # --- Public Doctors List Page ---
-    path('doctors/', views.DoctorPublicListView.as_view(), name='doctor_list'),
-    path('doctors/<int:pk>/', views.DoctorDetailView.as_view(), name='doctor_detail'),
+    # Public & Profile Views
+    path('doctors/', DoctorPublicListView.as_view(), name='doctor_list'),
+    path('doctor/<str:username>/', DoctorDetailView.as_view(), name='doctor_detail'),
 
-    # --- Doctor Slots URLs ---
-    path('slots/', views.DoctorSlotListView.as_view(), name='slot_list'),
-    path('slots/create/', views.DoctorSlotCreateView.as_view(), name='slot_create'),
+    # Appointment Management
+    path('', AppointmentListView.as_view(), name='appointment_list'),
+    path('<int:pk>/', AppointmentDetailView.as_view(), name='appointment_detail'),
+    path('book/', BookAppointmentView.as_view(), name='book_appointment'),
 
-    # --- Appointment URLs ---
-    path('', views.AppointmentListView.as_view(), name='appointment_list'),
-    path('<int:pk>/', views.AppointmentDetailView.as_view(), name='appointment_detail'),
-    path('book/', views.BookAppointmentView.as_view(), name='book_appointment'),
+    # Doctor Slots
+    path('slots/', DoctorSlotListView.as_view(), name='slot_list'),
+    path('create-slots/', create_slots, name='create_slots'),
+    path('delete-slot/<int:slot_id>/', delete_slot, name='delete_slot'),
+    path('check-slots/', check_slots, name='check_slots'),
 ]

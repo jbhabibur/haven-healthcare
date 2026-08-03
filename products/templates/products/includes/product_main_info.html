@@ -30,14 +30,14 @@
                 quantity: this.qty
             };
 
-            // 1. Collect Django CSRF Token from the DOM
+            // Collect Django CSRF Token from the DOM
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
             if (!csrfToken) {
                 alert('Security Error: CSRF token missing!');
                 return;
             }
 
-            // 2. Sending request to the correct namespaced URL 'products:add_to_cart'
+            // Sending request to the correct namespaced URL 'products:add_to_cart'
             fetch('{% url 'products:add_to_cart' %}', {
                 method: 'POST',
                 headers: {

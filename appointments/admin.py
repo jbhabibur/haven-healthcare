@@ -2,7 +2,7 @@
 from django.contrib import admin
 from .models import DoctorSlot, Appointment
 
-# --- DoctorSlot Admin ---
+# DoctorSlot Admin
 @admin.register(DoctorSlot)
 class DoctorSlotAdmin(admin.ModelAdmin):
     list_display = ('doctor', 'date', 'start_time', 'end_time', 'is_booked')
@@ -13,23 +13,25 @@ class DoctorSlotAdmin(admin.ModelAdmin):
 # --- Appointment Admin ---
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'patient', 'doctor', 'preferred_date', 'status', 'created_at')
-    list_filter = ('status', 'preferred_date', 'created_at')
+    
+    list_display = ('id', 'patient', 'doctor', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
     search_fields = (
         'patient__user__username', 
         'doctor__user__username', 
         'symptoms'
     )
-    readonly_fields = ('created_at', 'updated_at')
+
+    readonly_fields = ('created_at',)
     
     fieldsets = (
         ('Profiles', {
             'fields': ('patient', 'doctor', 'slot')
         }),
         ('Appointment Details', {
-            'fields': ('preferred_date', 'preferred_time_notes', 'symptoms')
+            'fields': ('symptoms', 'notes') 
         }),
-        ('Status & Timestamps', {
-            'fields': ('status', 'created_at', 'updated_at')
+        ('Status', {
+            'fields': ('status', 'created_at')
         }),
     )

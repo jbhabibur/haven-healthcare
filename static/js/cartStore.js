@@ -1,58 +1,58 @@
-import { createSlice, configureStore } from '@reduxjs/toolkit';
+const { createSlice, configureStore } = ReduxToolkit;
 
-// 1. Load cart state from LocalStorage to persist data on page refresh
+// Load cart state from LocalStorage to persist data on page refresh
 const loadCartState = () => {
-    try {
-        const serializedState = localStorage.getItem('beman_global_cart');
-        return serializedState ? JSON.parse(serializedState) : { items: [] };
-    } catch (err) {
-        return { items: [] };
-    }
+  try {
+    const serializedState = localStorage.getItem("beman_global_cart");
+    return serializedState ? JSON.parse(serializedState) : { items: [] };
+  } catch (err) {
+    return { items: [] };
+  }
 };
 
 const initialState = loadCartState();
 
-// 2. Create Cart Slice and define reducer actions
+// Create Cart Slice and define reducer actions
 const cartSlice = createSlice({
-    name: 'cart',
-    initialState,
-    reducers: {
-        addItem: (state, action) => {
-            const { id, name, price, image, maxStock, quantity } = action.payload;
-            const existingItem = state.items.find(item => item.id === id);
+  name: "cart",
+  initialState,
+  reducers: {
+    addItem: (state, action) => {
+      const { id, name, price, image, maxStock, quantity } = action.payload;
+      const existingItem = state.items.find((item) => item.id === id);
 
-            if (existingItem) {
-                if (existingItem.quantity + quantity <= maxStock) {
-                    existingItem.quantity += quantity;
-                } else {
-                    alert(`Sorry, only ${maxStock} units available in stock.`);
-                    existingItem.quantity = maxStock;
-                }
-            } else {
-                state.items.push({ id, name, price, image, maxStock, quantity });
-            }
-            
-            // Write updated state to LocalStorage
-            localStorage.setItem('beman_global_cart', JSON.stringify(state));
-        },
-        removeItem: (state, action) => {
-            state.items = state.items.filter(item => item.id !== action.payload);
-            localStorage.setItem('beman_global_cart', JSON.stringify(state));
+      if (existingItem) {
+        if (existingItem.quantity + quantity <= maxStock) {
+          existingItem.quantity += quantity;
+        } else {
+          alert(`Sorry, only ${maxStock} units available in stock.`);
+          existingItem.quantity = maxStock;
         }
-    }
+      } else {
+        state.items.push({ id, name, price, image, maxStock, quantity });
+      }
+
+      // Write updated state to LocalStorage
+      localStorage.setItem("beman_global_cart", JSON.stringify(state));
+    },
+    removeItem: (state, action) => {
+      state.items = state.items.filter((item) => item.id !== action.payload);
+      localStorage.setItem("beman_global_cart", JSON.stringify(state));
+    },
+  },
 });
 
-// 3. Extract actions from the slice
+// Extract actions from the slice
 const { addItem, removeItem } = cartSlice.actions;
 
-// 4. Configure the global Redux Store
+// Configure the global Redux Store
 const store = configureStore({
-    reducer: {
-        cart: cartSlice.reducer
-    }
+  reducer: {
+    cart: cartSlice.reducer,
+  },
 });
 
-// 5. Expose store and actions to the window object for global application access
+// Expose store and actions to the window object for global application access
 window.cartStore = store;
 window.addCartItemAction = addItem;
 window.removeCartItemAction = removeItem;

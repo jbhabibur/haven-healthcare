@@ -162,7 +162,7 @@
                     </a>
                     <form action="{% url 'accounts:logout' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="w-full flex items-center py-2 px-4 text-sm text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                        <button type="submit" class="w-full flex items-center py-2 px-4 text-sm text-red-500 hover:bg-red-50 rounded-md transition-colors cursor-pointer">
                             <i class="fa-solid fa-arrow-right-from-bracket mr-3"></i> Logout
                         </button>
                     </form>

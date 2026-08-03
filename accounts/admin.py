@@ -1,14 +1,15 @@
+# accounts/admin.py
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.forms import Textarea
 from django.db import models as django_models
-from .models import User, DoctorProfile, DoctorExperience, DoctorReview, PatientProfile
 
+from .models import User, DoctorProfile, DoctorExperience, DoctorReview, PatientProfile, MedicalRecord
 
-# --- Custom User Admin ---
+# Custom User Admin
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    """Extends standard UserAdmin to display and manage custom user roles"""
     list_display = ('username', 'email', 'role', 'is_staff', 'is_active')
     list_filter = ('role', 'is_staff', 'is_active')
     
@@ -24,16 +25,14 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
-# --- Inline Configurations for Doctor Profile ---
+# Inline Configurations for Doctor Profile
 class DoctorExperienceInline(admin.TabularInline):
-    """Enables managing multiple experiences directly inside the Doctor Profile detail view"""
     model = DoctorExperience
     fields = ('institution_name', 'designation', 'department', 'start_date', 'end_date')
     extra = 1  # Number of empty slots shown by default for new entries
 
-
+# Inline Configuration for Doctor Reviews
 class DoctorReviewInline(admin.TabularInline):
-    """Enables viewing patients' feedback directly inside the Doctor Profile detail view"""
     model = DoctorReview
     extra = 0
     # Set fields to read-only so administrators cannot alter submitted patient feedback
@@ -44,7 +43,7 @@ class DoctorReviewInline(admin.TabularInline):
         return False
 
 
-# --- Doctor Profile Admin ---
+# Doctor Profile Admin
 @admin.register(DoctorProfile)
 class DoctorProfileAdmin(admin.ModelAdmin):
     list_display = ('get_doctor_name', 'image', 'specialization', 'registration_number', 'consultation_fee', 'follow_up_fee', 'is_available')
@@ -78,10 +77,9 @@ class DoctorProfileAdmin(admin.ModelAdmin):
         return str(obj)
 
 
-# --- Doctor Review Admin (Standalone View) ---
+# Doctor Review Admin (Standalone View)
 @admin.register(DoctorReview)
 class DoctorReviewAdmin(admin.ModelAdmin):
-    """Standalone module to manage and audit patient reviews globally"""
     list_display = ('doctor', 'user', 'rating', 'created_at')
     list_filter = ('rating', 'created_at')
     search_fields = ('doctor__user__username', 'doctor__user__first_name', 'doctor__user__last_name', 'user__username', 'comment')
@@ -89,16 +87,49 @@ class DoctorReviewAdmin(admin.ModelAdmin):
     
     autocomplete_fields = ('doctor', 'user')
 
+    
+# Medical Record Admin
+@admin.register(MedicalRecord)
+class MedicalRecordAdmin(admin.ModelAdmin):
+    list_display = ('patient', 'doctor', 'diagnosis', 'date_recorded')
+    list_filter = ('date_recorded', 'doctor')
+    search_fields = ('patient__user__first_name', 'diagnosis', 'doctor__user__first_name')
+    autocomplete_fields = ('patient', 'doctor')
+    
+    readonly_fields = ('date_recorded', 'updated_at')
 
-# --- Patient Profile Admin ---
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser and not request.user.is_doctor:
+            return [field.name for field in self.model._meta.fields]
+        return self.readonly_fields
+    
+
+# Medical Record Inline Configuration
+class MedicalRecordInline(admin.TabularInline):
+    model = MedicalRecord
+    extra = 0
+    fields = ('doctor', 'diagnosis', 'treatment_notes', 'date_recorded')
+    readonly_fields = ('date_recorded',)
+
+    # This ensures that only superusers and doctors can add or change medical records inline, while others can only view them.
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser or request.user.is_doctor
+
+    def has_add_permission(self, request, obj=None):
+        return request.user.is_superuser or request.user.is_doctor
+
+
+# Patient Profile Admin
 @admin.register(PatientProfile)
 class PatientProfileAdmin(admin.ModelAdmin):
-    """Manages simple list view records for registered patients"""
     list_display = ('get_patient_name', 'phone_number', 'age', 'blood_group')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'phone_number', 'blood_group')
+    search_fields = ('user__username', 'user__first_name', 'last_name', 'user__email', 'phone_number', 'blood_group')
     list_filter = ('blood_group',)
     
     autocomplete_fields = ('user',)
+
+    # Include the inline configuration here
+    inlines = [MedicalRecordInline] 
 
     @admin.display(description='Patient Name', ordering='user__username')
     def get_patient_name(self, obj):

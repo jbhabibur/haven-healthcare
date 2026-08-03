@@ -8,8 +8,8 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
-        # Docker localhost domain URL
-        YOUR_DOMAIN = "http://127.0.0.1:8000" 
+        # Dynamically get the domain from settings to ensure it works in different environments
+        YOUR_DOMAIN = settings.SITE_URL
         
         try:
             # Create a dummy session and price ($25.00) for free testing

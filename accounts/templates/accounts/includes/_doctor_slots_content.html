@@ -1,0 +1,51 @@
+<div class="space-y-6">
+    <div class="bg-white p-6 border rounded-lg shadow-sm">
+        <h3 class="font-bold text-xl mb-4 text-gray-800">Create New Weekly Slots</h3>
+        <form  id="create-slot-form" method="POST" action="{% url 'appointments:create_slots' %}" @submit="localStorage.setItem('slotsOpen','true');
+        localStorage.setItem('scrollToSlots','true');
+    " class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            {% csrf_token %}
+            <div class="flex flex-col"><label class="text-sm font-medium text-gray-600 mb-1">Start Date</label><input type="date" name="start_date" class="border p-2 rounded" required></div>
+            <div class="flex flex-col"><label class="text-sm font-medium text-gray-600 mb-1">Start Time</label><input type="time" name="start_time" class="border p-2 rounded" required></div>
+            <div class="flex flex-col"><label class="text-sm font-medium text-gray-600 mb-1">End Time</label><input type="time" name="end_time" class="border p-2 rounded" required></div>
+            <div class="flex flex-col"><label class="text-sm font-medium text-gray-600 mb-1">Weeks</label><input type="number" name="weeks" value="1" min="1" max="12" class="border p-2 rounded"></div>
+            <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700">Create</button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for slot in slots %}
+            <div class="relative bg-white border {% if slot.is_booked %}border-green-200{% else %}border-gray-200{% endif %} p-4 rounded-lg shadow-sm">
+                
+                {% if not slot.is_booked %}
+                <a href="{% url 'appointments:delete_slot' slot.id %}" 
+                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-2xl"
+                onclick="return confirm('Are you sure you want to delete this slot?')">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                </a>
+                {% endif %}
+
+                <div class="flex justify-between items-start mb-2">
+                    <p class="font-bold text-gray-700">{{ slot.date|date:"D, M d, Y" }}</p>
+                    <span class="text-xs font-bold px-2 py-1 rounded {% if slot.is_booked %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {% if slot.is_booked %}Booked{% else %}Available{% endif %}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600 mb-3">{{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}</p>
+                
+                {% if slot.is_booked %}
+                    <div class="mt-2 pt-2 border-t">
+                        <p class="text-xs font-bold text-gray-500 uppercase">Patient Name:</p>
+                        {% for app in slot.appointments.all %}
+                            <p class="text-sm font-medium">{{ app.patient.user.first_name }} {{ app.patient.user.last_name }}</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-400 italic">No appointments yet</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
