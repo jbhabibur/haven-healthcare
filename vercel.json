@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "haven_healthcare/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "haven_healthcare/wsgi.py"
+    }
+  ]
+}

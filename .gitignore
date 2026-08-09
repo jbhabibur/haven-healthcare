@@ -17,3 +17,6 @@ staticfiles/
 
 # IDE settings
 .vscode/
+
+# Backup files
+backup.sql
