@@ -16,16 +16,14 @@ SECRET_KEY = 'django-insecure-y*thsz%xeb$pb0@i5-8j5fu@w3wm*a38!imon5rqf&((2(cx32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Allow specified hosts/domains to connect
-# Falls back to localhost if the environment variable is not set
+# Allow specified hosts/domains to connect using environment variables
+# Falls back to localhost and Vercel wildcard if the environment variable is not set
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
-    "localhost,127.0.0.1"
+    ".vercel.app,localhost,127.0.0.1"
 ).split(",")
 
-
-# Trusted origins for CSRF protection
-# Required for HTTPS requests from Vercel/Render domains
+# Trusted origins for CSRF protection from environment variables
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
     "http://localhost:8000"
