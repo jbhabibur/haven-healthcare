@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "haven_healthcare/wsgi.py",
+      "src": "core/wsgi.py",
       "use": "@vercel/python",
       "config": { "maxLambdaSize": "15mb" }
     }
@@ -14,7 +14,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "haven_healthcare/wsgi.py"
+      "dest": "core/wsgi.py"
     }
   ]
 }
