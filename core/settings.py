@@ -16,13 +16,20 @@ SECRET_KEY = 'django-insecure-y*thsz%xeb$pb0@i5-8j5fu@w3wm*a38!imon5rqf&((2(cx32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Allow specified hosts/domains to connect; falls back to localhost if the env variable is not set
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+# Allow specified hosts/domains to connect
+# Falls back to localhost if the environment variable is not set
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1"
+).split(",")
 
-# Define trusted origins for CSRF protection, stripping any extra whitespace from environment variables
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip() for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:8000").split(",")
-]
+
+# Trusted origins for CSRF protection
+# Required for HTTPS requests from Vercel/Render domains
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:8000"
+).split(",")
 
 # Site configuration
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000') # Default to localhost for development; override in production environment variables
